@@ -1,0 +1,140 @@
+/* Hover & Motion Overrides */
+
+:root {
+  --hover-intensity: 30%;
+  --hover-duration: var(--motion-fast);
+
+  --dropzone-stripe-color: color-mix(
+    in srgb,
+    var(--color-border) 14%,
+    transparent
+  );
+
+  --dropzone-hover-bg: color-mix(
+    in srgb,
+    var(--dz-color, var(--color-accent)) calc(var(--hover-intensity) * 0.35),
+    var(--color-bg-alt)
+  );
+
+  --process-btn-hover-shadow: 8px 8px 0px
+    color-mix(
+      in srgb,
+      var(--color-primary) var(--hover-intensity),
+      var(--color-border)
+    );
+  --download-btn-hover-shadow: 8px 8px 0px
+    color-mix(
+      in srgb,
+      var(--color-primary) var(--hover-intensity),
+      var(--color-border)
+    );
+}
+
+[data-theme="dark"] {
+  --hover-intensity: 38%;
+
+  --nav-hover-bg: color-mix(in srgb, var(--color-primary) 86%, #1a1208);
+  --hover-contrast-text: #22170c;
+
+  --nav-hover-shadow: 4px 4px 0
+    color-mix(in srgb, var(--color-primary) 52%, #000);
+  --theme-btn-hover-shadow: 5px 5px 0
+    color-mix(in srgb, var(--color-primary) 42%, #000);
+  --process-btn-hover-shadow: 8px 8px 0
+    color-mix(in srgb, var(--color-primary) 38%, #000);
+  --download-btn-hover-shadow: 8px 8px 0
+    color-mix(in srgb, var(--color-cta) 38%, #000);
+
+  --dropzone-stripe-color: rgba(255, 255, 255, 0.07);
+}
+
+/* Equalize hover transition timings on core controls */
+.navbar__nav-btn,
+.navbar__theme-btn,
+.dropzone__btn,
+.process-btn,
+.download-btn {
+  transition-duration: var(--hover-duration) !important;
+}
+
+/* Touch devices: use active/focus visuals instead of hover */
+@media (hover: none) and (pointer: coarse) {
+  .navbar__nav-btn::after {
+    transition: none;
+  }
+
+  .navbar__nav-btn:hover,
+  .navbar__theme-btn:hover,
+  .dropzone:hover,
+  .dropzone__btn:hover,
+  .tool-card:hover,
+  .process-btn:hover,
+  .download-btn:hover {
+    transform: none;
+    box-shadow: initial;
+  }
+
+  .navbar__nav-btn:active,
+  .navbar__nav-btn:focus-visible,
+  .navbar__theme-btn:active,
+  .navbar__theme-btn:focus-visible,
+  .dropzone__btn:active,
+  .dropzone__btn:focus-visible,
+  .process-btn:active,
+  .process-btn:focus-visible,
+  .download-btn:active,
+  .download-btn:focus-visible {
+    transform: translate(-2px, -2px);
+  }
+
+  .navbar__nav-btn:hover::after,
+  .navbar__dropdown.is-open .navbar__nav-btn::after {
+    opacity: 0;
+    transform: scaleX(0.15);
+  }
+
+  .navbar__nav-btn:active::after,
+  .navbar__nav-btn:focus-visible::after,
+  .navbar__dropdown.is-active .navbar__nav-btn::after {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+/* Reduced motion: keep color changes, remove movement */
+@media (prefers-reduced-motion: reduce) {
+  .navbar__nav-btn,
+  .navbar__theme-btn,
+  .dropzone,
+  .dropzone__btn,
+  .tool-card,
+  .process-btn,
+  .download-btn,
+  .file-list__item-remove,
+  .navbar__nav-btn::after,
+  .tool-card::after,
+  .dropzone::before {
+    transition: none !important;
+  }
+
+  .navbar__nav-btn::after,
+  .navbar__nav-btn:hover::after,
+  .navbar__dropdown.is-open .navbar__nav-btn::after,
+  .navbar__dropdown.is-active .navbar__nav-btn::after {
+    transform: scaleX(1) !important;
+  }
+
+  .navbar__nav-btn:hover,
+  .navbar__theme-btn:hover,
+  .dropzone:hover,
+  .dropzone__btn:hover,
+  .tool-card:hover,
+  .process-btn:hover,
+  .download-btn:hover,
+  .file-list__item-remove:hover,
+  .tool-card:active,
+  .process-btn:active,
+  .download-btn:active {
+    transform: none !important;
+  }
+}

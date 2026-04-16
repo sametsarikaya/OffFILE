@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+dist-ssr/
+*.local
+
+# Environment & secrets
+.env
+.env.local
+.env.*.local
+
+# Editor & OS
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs/
+tmp/
+
+# AI agents (Claude Code, Cursor, Copilot, Aider, etc.)
+.agent/
+.remember/
+memory/
+.claude/
+CLAUDE.md
+*.claude
+.instruct
+.cursorrules
+.aider*
+.copilot/
+.github/
+.windsurf/
+.codeium/
+.continue/
+.cursor/
+
+# Private project docs
+.docs/
