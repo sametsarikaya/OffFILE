@@ -39,6 +39,28 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).href;
 
+// pdfjs v4 instantiates its CanvasFactory with `new CanvasFactory({ ownerDocument })`.
+// In a Web Worker there is no `document`, so DOMCanvasFactory crashes.
+// We pass this class as `CanvasFactory` (uppercase) to every getDocument() call so pdfjs
+// uses OffscreenCanvas instead of document.createElement('canvas') everywhere internally.
+class OffscreenCanvasFactory {
+  constructor(_opts?: unknown) {}
+  create(width: number, height: number) {
+    const canvas  = new OffscreenCanvas(Math.max(1, width), Math.max(1, height));
+    const context = canvas.getContext('2d')!;
+    return { canvas: canvas as unknown as HTMLCanvasElement, context: context as unknown as CanvasRenderingContext2D };
+  }
+  reset(cc: { canvas: unknown }, width: number, height: number) {
+    const c = cc.canvas as OffscreenCanvas;
+    c.width  = Math.max(1, width);
+    c.height = Math.max(1, height);
+  }
+  destroy(cc: { canvas: unknown }) {
+    const c = cc.canvas as OffscreenCanvas;
+    c.width = 0; c.height = 0;
+  }
+}
+
 /* ---- Message handler ---- */
 
 self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
@@ -153,7 +175,9 @@ async function splitPdf(
 ): Promise<ProcessResult> {
   const src   = await PDFDocument.load(buffers[0]);
   const total = src.getPageCount();
-  const pages = parsePageRanges(String(options.pages || '1'), total);
+  const rawPages = String(options.pages || '').trim();
+  if (!rawPages) throw new Error('No pages selected. Click at least one page thumbnail to select it.');
+  const pages = parsePageRanges(rawPages, total);
   const mode  = (options.mode as string) || 'combined';
   onProgress(20);
 
@@ -222,14 +246,33 @@ async function removePdfPages(
 ): Promise<ProcessResult> {
   const src = await PDFDocument.load(buffers[0]);
   const total = src.getPageCount();
-  const pageToRemove = Math.max(1, Number(options.pages) || 1);
+  onProgress(20);
+
+  // Support comma-separated pages and ranges like "1,3-5,7"
+  const input = String(options.pages || '1');
+  const pagesToRemove = new Set<number>();
+  for (const part of input.split(',')) {
+    const t = part.trim();
+    const range = t.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (range) {
+      const a = Math.max(1, parseInt(range[1]));
+      const b = Math.min(total, parseInt(range[2]));
+      for (let i = a; i <= b; i++) pagesToRemove.add(i);
+    } else {
+      const n = parseInt(t);
+      if (!isNaN(n) && n >= 1 && n <= total) pagesToRemove.add(n);
+    }
+  }
+
+  if (pagesToRemove.size === 0) throw new Error('No valid page numbers specified.');
+  if (pagesToRemove.size >= total) throw new Error('Cannot remove all pages from a PDF.');
+
+  const invalid = [...pagesToRemove].filter((p) => p > total);
+  if (invalid.length > 0) throw new Error(`Page(s) ${invalid.join(', ')} don't exist. PDF has ${total} pages.`);
+
   onProgress(30);
-
-  if (pageToRemove > total) throw new Error(`Page ${pageToRemove} doesn't exist. PDF has ${total} pages.`);
-  if (total <= 1)           throw new Error('Cannot remove the only page from a PDF.');
-
   const out = await PDFDocument.create();
-  const indices = Array.from({ length: total }, (_, i) => i).filter((i) => i !== pageToRemove - 1);
+  const indices = Array.from({ length: total }, (_, i) => i).filter((i) => !pagesToRemove.has(i + 1));
   const copied = await out.copyPages(src, indices);
   copied.forEach((p) => out.addPage(p));
   onProgress(80);
@@ -237,7 +280,8 @@ async function removePdfPages(
   const bytes = await out.save();
   onProgress(100);
   const base = fileNames[0].replace(/\.pdf$/i, '');
-  return { buffer: bytes.buffer as ArrayBuffer, filename: `${base}_removed_p${pageToRemove}.pdf`, mime: 'application/pdf' };
+  const label = [...pagesToRemove].sort((a, b) => a - b).join('_');
+  return { buffer: bytes.buffer as ArrayBuffer, filename: `${base}_removed_p${label}.pdf`, mime: 'application/pdf' };
 }
 
 async function rotatePdf(
@@ -346,7 +390,7 @@ async function compressPdf(
   const jpegQ = jpegQMap[quality] ?? 0.65;
   onProgress(10);
 
-  const pdfDoc = await pdfjsLib.getDocument({ data: buffers[0] }).promise;
+  const pdfDoc = await pdfjsLib.getDocument({ data: buffers[0], CanvasFactory: OffscreenCanvasFactory } as any).promise;
   const totalPages = pdfDoc.numPages;
   onProgress(15);
 
@@ -385,75 +429,115 @@ async function pdfToImage(
   buffers: ArrayBuffer[], fileNames: string[],
   options: Record<string, unknown>, onProgress: ProgressFn
 ): Promise<ProcessResult> {
-  const format   = (options.format as string) || 'image/png';
-  const scale    = parseFloat(options.scale  as string) || 2;
-  onProgress(10);
+  const format  = (options.format as string) || 'image/png';
+  const ext     = format === 'image/jpeg' ? 'jpg' : 'png';
+  const quality = format === 'image/jpeg' ? 0.92 : 1;
+  // Fixed scale: render at 1.5× native PDF points → ~108 DPI, good balance of size and clarity
+  const SCALE = 1.5;
 
-  const pdfDoc    = await pdfjsLib.getDocument({ data: buffers[0] }).promise;
+  onProgress(5);
+  const pdfDoc     = await pdfjsLib.getDocument({ data: buffers[0], CanvasFactory: OffscreenCanvasFactory } as any).promise;
   const totalPages = pdfDoc.numPages;
-  const pageNum   = Math.max(1, Math.min(totalPages, Number(options.page) || 1));
+  const base       = fileNames[0].replace(/\.pdf$/i, '');
 
-  if (pageNum > totalPages) {
-    throw new Error(`Page ${pageNum} doesn't exist - this PDF has ${totalPages} page${totalPages > 1 ? 's' : ''}.`);
+  // Respect page selection from the interactive panel; fall back to all pages
+  const rawPages = String(options.pages || '').trim();
+  const pagesToRender = rawPages
+    ? parsePageRanges(rawPages, totalPages)
+    : Array.from({ length: totalPages }, (_, i) => i + 1);
+
+  if (pagesToRender.length === 0) throw new Error('No pages selected.');
+
+  const renderPage = async (pageNum: number): Promise<{ buffer: ArrayBuffer; filename: string }> => {
+    const page     = await pdfDoc.getPage(pageNum);
+    const viewport = page.getViewport({ scale: SCALE });
+
+    const canvas = new OffscreenCanvas(Math.round(viewport.width), Math.round(viewport.height));
+    const ctx    = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    await page.render({
+      canvasContext: ctx as unknown as CanvasRenderingContext2D,
+      viewport,
+    }).promise;
+
+    const blob   = await canvas.convertToBlob({ type: format, quality });
+    const buffer = await blob.arrayBuffer();
+    const suffix = pagesToRender.length > 1 ? `_page${pageNum}` : '';
+    return { buffer, filename: `${base}${suffix}.${ext}` };
+  };
+
+  if (pagesToRender.length === 1) {
+    const result = await renderPage(pagesToRender[0]);
+    onProgress(100);
+    return { buffer: result.buffer, filename: result.filename, mime: format };
   }
 
-  const page     = await pdfDoc.getPage(pageNum);
-  const viewport = page.getViewport({ scale });
-  onProgress(40);
+  // Multiple pages → bundle into ZIP
+  const zip = new JSZip();
+  for (let i = 0; i < pagesToRender.length; i++) {
+    const result = await renderPage(pagesToRender[i]);
+    zip.file(result.filename, result.buffer);
+    onProgress(5 + ((i + 1) / pagesToRender.length) * 90);
+  }
 
-  const canvas = new OffscreenCanvas(viewport.width, viewport.height);
-  const ctx    = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
-
-  await page.render({
-    canvasContext: ctx as unknown as CanvasRenderingContext2D,
-    viewport,
-  }).promise;
-  onProgress(85);
-
-  const quality = format === 'image/jpeg' ? 0.92 : 1;
-  const blob    = await canvas.convertToBlob({ type: format, quality });
-  const buffer  = await blob.arrayBuffer();
+  const zipBuffer = await zip.generateAsync({ type: 'arraybuffer' });
   onProgress(100);
-
-  const ext  = format === 'image/jpeg' ? 'jpg' : 'png';
-  const base = fileNames[0].replace(/\.pdf$/i, '');
-  const suffix = totalPages > 1 ? `_page${pageNum}` : '';
-  return { buffer, filename: `${base}${suffix}.${ext}`, mime: format };
+  return { buffer: zipBuffer, filename: `${base}_pages.zip`, mime: 'application/zip' };
 }
 
 async function pdfMetadata(
   buffers: ArrayBuffer[], fileNames: string[],
   options: Record<string, unknown>, onProgress: ProgressFn
 ): Promise<ProcessResult> {
-  const mode = (options.mode as string) || 'view';
+  const mode = (options.mode as string) || 'edit';
   onProgress(20);
 
   const doc = await PDFDocument.load(buffers[0]);
   onProgress(50);
 
+  const base = fileNames[0].replace(/\.pdf$/i, '');
+
+  if (mode === 'strip') {
+    doc.setTitle('');
+    doc.setAuthor('');
+    doc.setSubject('');
+    doc.setKeywords([]);
+    doc.setCreator('');
+    doc.setProducer('');
+    doc.setCreationDate(new Date(0));
+    doc.setModificationDate(new Date(0));
+    onProgress(80);
+    const bytes = await doc.save();
+    onProgress(100);
+    return { buffer: bytes.buffer as ArrayBuffer, filename: `${base}_clean.pdf`, mime: 'application/pdf' };
+  }
+
+  if (mode === 'edit') {
+    if ('title'    in options) doc.setTitle(String(options.title    ?? ''));
+    if ('author'   in options) doc.setAuthor(String(options.author   ?? ''));
+    if ('subject'  in options) doc.setSubject(String(options.subject  ?? ''));
+    if ('creator'  in options) doc.setCreator(String(options.creator  ?? ''));
+    if ('producer' in options) doc.setProducer(String(options.producer ?? ''));
+    if ('keywords' in options) {
+      const kw = String(options.keywords ?? '');
+      doc.setKeywords(kw ? kw.split(',').map((s) => s.trim()).filter(Boolean) : []);
+    }
+    onProgress(80);
+    const bytes = await doc.save();
+    onProgress(100);
+    return { buffer: bytes.buffer as ArrayBuffer, filename: `${base}_edited.pdf`, mime: 'application/pdf' };
+  }
+
+  // mode === 'view': return a text metadata report (legacy fallback)
   const title   = doc.getTitle()   || '(none)';
   const author  = doc.getAuthor()  || '(none)';
   const subject = doc.getSubject() || '(none)';
   const creator = doc.getCreator() || '(none)';
   const pages   = doc.getPageCount();
 
-  if (mode === 'strip') {
-    doc.setTitle('');
-    doc.setAuthor('');
-    doc.setSubject('');
-    doc.setCreator('OffFILE');
-    doc.setProducer('OffFILE');
-    doc.setCreationDate(new Date());
-    doc.setModificationDate(new Date());
-    onProgress(80);
-
-    const bytes = await doc.save();
-    onProgress(100);
-    const base = fileNames[0].replace(/\.pdf$/i, '');
-    return { buffer: bytes.buffer as ArrayBuffer, filename: `${base}_clean.pdf`, mime: 'application/pdf' };
-  }
-
-  // mode === 'view': return a metadata report as plain text
   const report = [
     '=== PDF Metadata Report ===',
     `File:    ${fileNames[0]}`,
@@ -464,12 +548,9 @@ async function pdfMetadata(
     `Author:  ${author}`,
     `Subject: ${subject}`,
     `Creator: ${creator}`,
-    '',
-    'To remove this metadata, re-run with "Strip & clean metadata" selected.',
   ].join('\n');
 
   onProgress(100);
-  const base = fileNames[0].replace(/\.pdf$/i, '');
   return {
     buffer: new TextEncoder().encode(report).buffer as ArrayBuffer,
     filename: `${base}_metadata.txt`,
@@ -706,23 +787,65 @@ async function imageFilters(
 
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   const ctx    = canvas.getContext('2d')!;
-
-  // Build CSS filter string scaled by intensity
-  const pct = Math.round(intensity * 100);
-  const filterMap: Record<string, string> = {
-    grayscale:  `grayscale(${pct}%)`,
-    sepia:      `sepia(${pct}%)`,
-    invert:     `invert(${pct}%)`,
-    brightness: `brightness(${100 + Math.round(30 * intensity)}%)`,
-    contrast:   `contrast(${100 + Math.round(50 * intensity)}%)`,
-    blur:       `blur(${(3 * intensity).toFixed(1)}px)`,
-    saturate:   `saturate(${100 + Math.round(200 * intensity)}%)`,
-  };
-
-  (ctx as unknown as { filter: string }).filter = filterMap[filter] || 'none';
   ctx.drawImage(bitmap, 0, 0);
-  (ctx as unknown as { filter: string }).filter = 'none';
   bitmap.close();
+
+  // Pixel-level filter implementation — works in all browsers (no ctx.filter)
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i], g = data[i + 1], b = data[i + 2];
+
+    if (filter === 'grayscale') {
+      const luma = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+      const mixed = (v: number) => Math.round(v + (luma - v) * intensity);
+      data[i] = mixed(r); data[i + 1] = mixed(g); data[i + 2] = mixed(b);
+
+    } else if (filter === 'sepia') {
+      const sr = Math.min(255, Math.round(r * 0.393 + g * 0.769 + b * 0.189));
+      const sg = Math.min(255, Math.round(r * 0.349 + g * 0.686 + b * 0.168));
+      const sb = Math.min(255, Math.round(r * 0.272 + g * 0.534 + b * 0.131));
+      data[i]     = Math.round(r + (sr - r) * intensity);
+      data[i + 1] = Math.round(g + (sg - g) * intensity);
+      data[i + 2] = Math.round(b + (sb - b) * intensity);
+
+    } else if (filter === 'invert') {
+      data[i]     = Math.round(r + (255 - r - r) * intensity);
+      data[i + 1] = Math.round(g + (255 - g - g) * intensity);
+      data[i + 2] = Math.round(b + (255 - b - b) * intensity);
+
+    } else if (filter === 'brightness') {
+      const delta = Math.round(80 * intensity);
+      data[i]     = Math.min(255, r + delta);
+      data[i + 1] = Math.min(255, g + delta);
+      data[i + 2] = Math.min(255, b + delta);
+
+    } else if (filter === 'contrast') {
+      const factor = (1 + intensity * 1.5);
+      data[i]     = Math.min(255, Math.max(0, Math.round((r - 128) * factor + 128)));
+      data[i + 1] = Math.min(255, Math.max(0, Math.round((g - 128) * factor + 128)));
+      data[i + 2] = Math.min(255, Math.max(0, Math.round((b - 128) * factor + 128)));
+
+    } else if (filter === 'saturate') {
+      const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+      const sat  = 1 + 2 * intensity;
+      data[i]     = Math.min(255, Math.max(0, Math.round(luma + (r - luma) * sat)));
+      data[i + 1] = Math.min(255, Math.max(0, Math.round(luma + (g - luma) * sat)));
+      data[i + 2] = Math.min(255, Math.max(0, Math.round(luma + (b - luma) * sat)));
+
+    } else if (filter === 'blur') {
+      // Blur applied below via box-blur pass; skip per-pixel here
+    }
+  }
+
+  // Box blur — two-pass (horizontal then vertical) for performance
+  if (filter === 'blur') {
+    const radius = Math.max(1, Math.round(12 * intensity));
+    applyBoxBlur(imageData, canvas.width, canvas.height, radius);
+  }
+
+  ctx.putImageData(imageData, 0, 0);
   onProgress(80);
 
   const mime   = outMime(fileMimes[0]);
@@ -732,6 +855,43 @@ async function imageFilters(
 
   const base = fileNames[0].replace(/\.[^.]+$/, '');
   return { buffer, filename: `${base}_${filter}.${outExt(mime)}`, mime };
+}
+
+/** Fast single-pass box blur on ImageData (horizontal + vertical). */
+function applyBoxBlur(imageData: ImageData, w: number, h: number, radius: number): void {
+  const src = new Uint8ClampedArray(imageData.data);
+  const dst = imageData.data;
+  const r   = Math.min(radius, Math.floor(Math.min(w, h) / 2) - 1);
+  const size = 2 * r + 1;
+
+  // Horizontal pass
+  const tmp = new Uint8ClampedArray(dst.length);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let rr = 0, gg = 0, bb = 0, count = 0;
+      for (let dx = -r; dx <= r; dx++) {
+        const nx = Math.min(w - 1, Math.max(0, x + dx));
+        const idx = (y * w + nx) * 4;
+        rr += src[idx]; gg += src[idx + 1]; bb += src[idx + 2]; count++;
+      }
+      const oi = (y * w + x) * 4;
+      tmp[oi] = rr / count; tmp[oi + 1] = gg / count; tmp[oi + 2] = bb / count; tmp[oi + 3] = src[oi + 3];
+    }
+  }
+  // Vertical pass
+  for (let x = 0; x < w; x++) {
+    for (let y = 0; y < h; y++) {
+      let rr = 0, gg = 0, bb = 0, count = 0;
+      for (let dy = -r; dy <= r; dy++) {
+        const ny = Math.min(h - 1, Math.max(0, y + dy));
+        const idx = (ny * w + x) * 4;
+        rr += tmp[idx]; gg += tmp[idx + 1]; bb += tmp[idx + 2]; count++;
+      }
+      const oi = (y * w + x) * 4;
+      dst[oi] = rr / count; dst[oi + 1] = gg / count; dst[oi + 2] = bb / count; dst[oi + 3] = tmp[oi + 3];
+    }
+  }
+  void size; // suppress unused warning
 }
 
 async function stripMetadata(
@@ -1133,7 +1293,7 @@ async function pdfToText(
   _options: Record<string, unknown>, onProgress: ProgressFn
 ): Promise<ProcessResult> {
   onProgress(10);
-  const pdfDoc     = await pdfjsLib.getDocument({ data: buffers[0] }).promise;
+  const pdfDoc     = await pdfjsLib.getDocument({ data: buffers[0], CanvasFactory: OffscreenCanvasFactory } as any).promise;
   const totalPages = pdfDoc.numPages;
   const lines: string[] = [`PDF Text Extraction - ${fileNames[0]}`, ''];
 
@@ -1260,7 +1420,7 @@ async function pdfResizePage(
   let [pw, ph] = pageSizes[targetSize] ?? pageSizes.a4;
   if (orientation === 'landscape') [pw, ph] = [ph, pw];
 
-  const srcPdf    = await pdfjsLib.getDocument({ data: buffers[0] }).promise;
+  const srcPdf    = await pdfjsLib.getDocument({ data: buffers[0], CanvasFactory: OffscreenCanvasFactory } as any).promise;
   const totalPgs  = srcPdf.numPages;
   const outDoc    = await PDFDocument.create();
   onProgress(15);

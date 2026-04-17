@@ -5,9 +5,12 @@ const imageFilters: Tool = {
   title: 'Image Filters',
   description: 'Apply visual filters like grayscale, sepia, invert, and blur with adjustable intensity.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="12" cy="12" r="10"/>
-    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
-    <path d="M2 12h20"/>
+    <rect x="2" y="2" width="20" height="13" rx="2"/>
+    <circle cx="7" cy="7.5" r="1.5"/>
+    <path d="M2 11l4-4 3 3 4-4 5 5"/>
+    <line x1="4" y1="19" x2="20" y2="19"/>
+    <circle cx="9" cy="19" r="2"/>
+    <circle cx="16" cy="19" r="2"/>
   </svg>`,
   color: '#AB47BC',
   category: 'image',

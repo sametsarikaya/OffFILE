@@ -5,9 +5,14 @@ const imageConvert: Tool = {
   title: 'Convert Image',
   description: 'Convert images between PNG, JPEG, WebP formats - including SVG.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="0"/>
-    <circle cx="9" cy="9" r="2"/>
-    <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
+    <rect x="2" y="4" width="8" height="8" rx="1"/>
+    <circle cx="5" cy="7" r="1"/>
+    <path d="M2 12l2.5 2 2.5-2"/>
+    <rect x="14" y="12" width="8" height="8" rx="1"/>
+    <circle cx="17" cy="15" r="1"/>
+    <path d="M22 12l-2.5-2-2.5 2"/>
+    <path d="M10 8h2a2 2 0 0 1 2 2v2"/>
+    <path d="M14 16h-2a2 2 0 0 1-2-2v-2"/>
   </svg>`,
   color: '#2196F3',
   category: 'image',

@@ -15,6 +15,7 @@ import pdfMetadata     from './pdf/pdfMetadata';
 import pdfReorderPages from './pdf/pdfReorderPages';
 import pdfAddBlank     from './pdf/pdfAddBlank';
 import pdfResizePage   from './pdf/pdfResizePage';
+// pdfLock and pdfUnlock removed — pdf-lib does not support encryption
 
 // Image Tools
 import imageConvert   from './image/imageConvert';

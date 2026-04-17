@@ -5,10 +5,11 @@ const imageCompress: Tool = {
   title: 'Compress Image',
   description: 'Reduce image file size with adjustable quality and output format.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <polyline points="4 14 4 20 10 20"/>
-    <polyline points="20 10 20 4 14 4"/>
-    <line x1="14" y1="10" x2="21" y2="3"/>
-    <line x1="3" y1="21" x2="10" y2="14"/>
+    <rect x="3" y="3" width="18" height="18" rx="2"/>
+    <circle cx="8.5" cy="8.5" r="1.5"/>
+    <path d="M3 15l5-5 4 4 3-3 4 4"/>
+    <path d="M19 5l-3 3m0 0v-3m0 3h-3"/>
+    <path d="M5 19l3-3m0 0v3m0-3H5"/>
   </svg>`,
   color: '#FF9800',
   category: 'image',

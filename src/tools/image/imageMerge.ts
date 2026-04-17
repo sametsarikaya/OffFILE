@@ -7,8 +7,14 @@ const imageMerge: Tool = {
   title: 'Merge / Stack Images',
   description: 'Combine multiple images into one - side by side or stacked vertically.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="2" y="4" width="9" height="16" rx="1"/>
-    <rect x="13" y="4" width="9" height="16" rx="1"/>
+    <rect x="2" y="4" width="8" height="14" rx="1"/>
+    <circle cx="5.5" cy="8" r="1"/>
+    <path d="M2 18l3-3.5 3 3.5"/>
+    <rect x="14" y="4" width="8" height="14" rx="1"/>
+    <circle cx="17.5" cy="8" r="1"/>
+    <path d="M22 18l-3-3.5-3 3.5"/>
+    <path d="M10 11h4"/>
+    <polyline points="12 9 14 11 12 13"/>
   </svg>`,
   color: '#5C6BC0',
   category: 'image',

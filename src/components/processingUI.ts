@@ -9,6 +9,7 @@ interface DownloadEntry {
 
 interface DownloadOptions {
   onRestart: () => void;
+  onProcessAgain?: () => void;
   comparison?: {
     direction: 'smaller' | 'larger';
     percent: number;
@@ -80,6 +81,7 @@ export function showDownload(
 ): { cleanup: () => void } {
   const {
     onRestart,
+    onProcessAgain,
     comparison,
     canCopyText = false,
     additionalDownloads = [],
@@ -152,9 +154,10 @@ export function showDownload(
       </div>
       ${isPreviewSupported(blob, filename) ? `<div class="download-area__preview" id="download-preview"><h3 class="download-area__preview-title">Preview</h3><div class="download-area__preview-body" id="download-preview-body"></div></div>` : ''}
       ${extraUrls.length > 0 ? `<div class="download-area__list" id="download-list"><h3 class="download-area__list-title">Download Individually</h3><ul class="download-area__list-items"></ul></div>` : ''}
-      <button class="download-area__restart" id="restart-btn" type="button">
-        Process Another File
-      </button>
+      <div class="download-area__restart-row">
+        ${onProcessAgain ? `<button class="download-area__restart download-area__restart--again" id="process-again-btn" type="button">Process Again (Same File)</button>` : ''}
+        <button class="download-area__restart" id="restart-btn" type="button">Start Over</button>
+      </div>
     </div>
   `;
 
@@ -175,6 +178,12 @@ export function showDownload(
   restartBtn.addEventListener('click', () => {
     cleanup();
     onRestart();
+  });
+
+  const processAgainBtn = container.querySelector('#process-again-btn') as HTMLButtonElement | null;
+  processAgainBtn?.addEventListener('click', () => {
+    cleanup();
+    onProcessAgain?.();
   });
 
   return { cleanup };
@@ -300,8 +309,9 @@ function flashButton(btn: HTMLButtonElement, tempLabel: string, resetLabel: stri
 export function showError(
   container: HTMLElement,
   message: string,
-  onRestart: () => void
+  opts: { onRetry: () => void; onRestart?: () => void }
 ): void {
+  const { onRetry, onRestart } = opts;
   const friendlyMessage = getFriendlyErrorMessage(message);
 
   container.innerHTML = `
@@ -313,35 +323,30 @@ export function showError(
           <line x1="9" y1="9" x2="15" y2="15"/>
         </svg>
       </div>
-      <h2 class="error-area__title">An Error Occurred</h2>
+      <h2 class="error-area__title">Something went wrong</h2>
       <p class="error-area__text">${escapeHtml(friendlyMessage)}</p>
       <details class="error-area__details">
         <summary>Technical details</summary>
         <pre>${escapeHtml(message)}</pre>
       </details>
       <div class="error-area__actions">
-        <button class="process-btn process-btn--ready error-area__retry" id="error-retry-btn" type="button">Try Again</button>
-        <button class="download-alt-btn" id="error-copy-btn" type="button">Copy Error</button>
+        <button class="process-btn process-btn--ready error-area__retry" id="error-retry-btn" type="button">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.5"/>
+          </svg>
+          Try Again
+        </button>
+        ${onRestart ? `<button class="download-alt-btn" id="error-restart-btn" type="button">Start Over</button>` : ''}
       </div>
     </div>
   `;
 
   const retryBtn = container.querySelector('#error-retry-btn') as HTMLButtonElement;
-  retryBtn.addEventListener('click', onRestart);
+  retryBtn.addEventListener('click', onRetry);
 
-  const copyBtn = container.querySelector('#error-copy-btn') as HTMLButtonElement;
-  copyBtn.addEventListener('click', async () => {
-    if (!navigator.clipboard) {
-      flashButton(copyBtn, 'Copy failed', 'Copy Error');
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(message);
-      flashButton(copyBtn, 'Copied', 'Copy Error');
-    } catch {
-      flashButton(copyBtn, 'Copy failed', 'Copy Error');
-    }
-  });
+  const restartBtn = container.querySelector('#error-restart-btn') as HTMLButtonElement | null;
+  restartBtn?.addEventListener('click', () => onRestart!());
 }
 
 function isPreviewSupported(blob: Blob, filename: string): boolean {

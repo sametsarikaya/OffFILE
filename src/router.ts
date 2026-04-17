@@ -173,63 +173,76 @@ function renderHome(): void {
   const footer = document.createElement('footer');
   footer.className = 'footer';
   footer.innerHTML = `
-    <section class="privacy-card privacy-card--footer" id="privacy-card-footer">
-      <button class="privacy-card__toggle" id="privacy-toggle" aria-expanded="false" aria-controls="privacy-body" type="button">
-        <div class="privacy-card__toggle-left">
-          <div class="privacy-card__icon">
-            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <section class="privacy-bar" aria-label="Privacy guarantee">
+      <div class="privacy-bar__inner">
+        <div class="privacy-bar__lead">
+          <div class="privacy-bar__shield">
+            <svg viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
             </svg>
           </div>
-          <div class="privacy-card__summary">
-            <span class="privacy-card__title">Privacy-First</span>
-            <span class="privacy-card__subtitle">Files never leave your device.</span>
+          <div class="privacy-bar__lead-copy">
+            <div class="privacy-bar__eyebrow">100% Client-Side</div>
+            <h2 class="privacy-bar__heading">Privacy<br>First.</h2>
+            <p class="privacy-bar__tagline">Your files never leave this browser — no servers, no uploads, no tracking.</p>
           </div>
         </div>
-        <div class="privacy-card__toggle-right">
-          <div class="privacy-card__chips" aria-hidden="true">
-            <span class="privacy-chip">No Upload</span>
-            <span class="privacy-chip">No Tracking</span>
-            <span class="privacy-chip">Offline</span>
+        <div class="privacy-bar__pillars">
+          <div class="privacy-bar__pillar">
+            <div class="privacy-bar__pillar-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+              </svg>
+            </div>
+            <strong class="privacy-bar__pillar-label">No Upload</strong>
+            <span class="privacy-bar__pillar-desc">All processing happens locally — files never leave your device</span>
           </div>
-          <svg class="privacy-card__chevron" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </div>
-      </button>
-      <div class="privacy-card__body" id="privacy-body" role="region" aria-labelledby="privacy-toggle">
-        <div class="privacy-card__body-inner">
-          <p class="privacy-card__text">
-            Everything runs locally. Your files never leave your browser - no server, no cloud, no waiting.
-          </p>
-          <ul class="privacy-card__list">
-            <li>Files stay on your device, always</li>
-            <li>No cookies, no analytics, no tracking</li>
-            <li>No account needed - just open and use</li>
-            <li>Open source - code on GitHub</li>
-          </ul>
+          <div class="privacy-bar__pillar">
+            <div class="privacy-bar__pillar-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </div>
+            <strong class="privacy-bar__pillar-label">No Tracking</strong>
+            <span class="privacy-bar__pillar-desc">Zero analytics, no cookies, no data collection of any kind</span>
+          </div>
+          <div class="privacy-bar__pillar">
+            <div class="privacy-bar__pillar-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+              </svg>
+            </div>
+            <strong class="privacy-bar__pillar-label">Works Offline</strong>
+            <span class="privacy-bar__pillar-desc">No internet required after first load — fully self-contained</span>
+          </div>
+          <div class="privacy-bar__pillar">
+            <div class="privacy-bar__pillar-icon">
+              <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"/>
+                <polyline points="8 6 2 12 8 18"/>
+              </svg>
+            </div>
+            <strong class="privacy-bar__pillar-label">Open Source</strong>
+            <span class="privacy-bar__pillar-desc">AGPL-3.0 licensed — fully auditable code, no hidden behavior</span>
+          </div>
         </div>
       </div>
+      <div class="privacy-bar__bottom">
+        <span class="privacy-bar__bottom-brand">OffFILE</span>
+        <span class="privacy-bar__bottom-sep">|</span>
+        <a class="privacy-bar__bottom-link" href="https://github.com/sametsarikaya/OffFILE" target="_blank" rel="noopener noreferrer">github.com/sametsarikaya/OffFILE</a>
+        <span class="privacy-bar__bottom-sep">|</span>
+        <span class="privacy-bar__bottom-tag">Open Source File Tools</span>
+        <span class="privacy-bar__bottom-sep">|</span>
+        <span class="privacy-bar__bottom-count">${getAllTools().length} Tools</span>
+      </div>
     </section>
-    <div class="footer__bottom">
-      <span class="footer__name">OffFILE</span>
-      <span class="footer__sep">|</span>
-      <a class="footer__link" href="https://github.com/sametsarikaya/OffFILE" target="_blank" rel="noopener noreferrer">https://github.com/sametsarikaya/OffFILE</a>
-      <span class="footer__sep">|</span>
-      <span class="footer__tagline">Open Source File Tools</span>
-      <span class="footer__sep">|</span>
-      <span class="footer__count">${getAllTools().length} Tools</span>
-    </div>
   `;
   container.appendChild(footer);
-
-  const privacyToggleBtn = footer.querySelector<HTMLButtonElement>('#privacy-toggle')!;
-  const privacyCard = footer.querySelector<HTMLElement>('#privacy-card-footer')!;
-  privacyToggleBtn.addEventListener('click', () => {
-    const expanded = privacyToggleBtn.getAttribute('aria-expanded') === 'true';
-    privacyToggleBtn.setAttribute('aria-expanded', String(!expanded));
-    privacyCard.classList.toggle('is-open', !expanded);
-  });
 
   // Search logic (navbar-integrated)
   let searchResultSection: HTMLElement | null = null;
@@ -601,7 +614,7 @@ async function runProcess(tool: Tool, workArea: HTMLElement): Promise<void> {
         renderDropState(tool, workArea);
       }).catch((err) => {
         const message = err instanceof Error ? err.message : 'Could not render palette.';
-        showError(workArea, message, () => renderDropState(tool, workArea));
+        showError(workArea, message, { onRetry: () => renderFilesSelected(tool, workArea), onRestart: () => renderDropState(tool, workArea) });
       });
       return;
     }
@@ -612,6 +625,9 @@ async function runProcess(tool: Tool, workArea: HTMLElement): Promise<void> {
       onRestart: () => {
         renderDropState(tool, workArea);
       },
+      onProcessAgain: () => {
+        renderFilesSelected(tool, workArea);
+      },
       comparison,
       canCopyText: isTextOutput(result.blob, result.filename),
       additionalDownloads,
@@ -621,8 +637,9 @@ async function runProcess(tool: Tool, workArea: HTMLElement): Promise<void> {
   } catch (err) {
     if (err instanceof Error && err.message === 'Cancelled') return;
     const message = err instanceof Error ? err.message : 'An unknown error occurred.';
-    showError(workArea, message, () => {
-      renderDropState(tool, workArea);
+    showError(workArea, message, {
+      onRetry: () => renderFilesSelected(tool, workArea),
+      onRestart: () => renderDropState(tool, workArea),
     });
   }
 }
@@ -660,6 +677,9 @@ async function runBatchProcess(tool: Tool, workArea: HTMLElement): Promise<void>
       onRestart: () => {
         renderDropState(tool, workArea);
       },
+      onProcessAgain: () => {
+        renderFilesSelected(tool, workArea);
+      },
       comparison,
       additionalDownloads: results,
       enableShare: true,
@@ -668,8 +688,9 @@ async function runBatchProcess(tool: Tool, workArea: HTMLElement): Promise<void>
   } catch (err) {
     if (cancelled || (err instanceof Error && err.message === 'Cancelled')) return;
     const message = err instanceof Error ? err.message : 'An unknown error occurred.';
-    showError(workArea, message, () => {
-      renderDropState(tool, workArea);
+    showError(workArea, message, {
+      onRetry: () => renderFilesSelected(tool, workArea),
+      onRestart: () => renderDropState(tool, workArea),
     });
   }
 }

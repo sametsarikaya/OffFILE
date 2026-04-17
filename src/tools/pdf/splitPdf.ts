@@ -34,10 +34,11 @@ const splitPdf: Tool = {
   title: 'Split PDF',
   description: 'Click page thumbnails to select pages, then extract.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
     <polyline points="14 2 14 8 20 8"/>
-    <line x1="12" y1="18" x2="12" y2="12"/>
-    <path d="m9 15 3 3 3-3"/>
+    <path d="M12 11v8"/>
+    <path d="M9 13l-2 2 2 2"/>
+    <path d="M15 13l2 2-2 2"/>
   </svg>`,
   color: '#E91E63',
   category: 'pdf',
@@ -98,10 +99,15 @@ const splitPdf: Tool = {
 
     const syncPages = () => {
       const sorted = [...selected].sort((a, b) => a - b);
-      options.pages = sorted.join(',');
-      counterEl.textContent = selected.size > 0
-        ? `${selected.size} of ${total} pages selected`
-        : 'Click pages to select';
+      // Empty string signals the process button should stay disabled
+      options.pages = sorted.length > 0 ? sorted.join(',') : '';
+      if (selected.size === 0) {
+        counterEl.textContent = '⚠ Select at least one page';
+        counterEl.style.color = 'var(--clr-danger, #f44336)';
+      } else {
+        counterEl.textContent = `${selected.size} of ${total} pages selected`;
+        counterEl.style.color = '';
+      }
     };
 
     // Header

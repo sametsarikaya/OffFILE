@@ -205,9 +205,14 @@ const imageCrop: Tool = {
       draw();
     });
 
-    // Initial draw after layout
-    requestAnimationFrame(() => { draw(); });
-    URL.revokeObjectURL(imgUrl);
+    // Initial draw after layout - use rAF twice to ensure element is in DOM with real dimensions
+    const imgUrl2 = URL.createObjectURL(file);
+    const imgForDraw = new Image();
+    imgForDraw.onload = () => {
+      URL.revokeObjectURL(imgUrl2);
+      requestAnimationFrame(() => requestAnimationFrame(() => { draw(); }));
+    };
+    imgForDraw.src = imgUrl2;
 
     return wrap;
   },

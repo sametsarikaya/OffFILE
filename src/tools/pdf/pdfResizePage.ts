@@ -5,11 +5,11 @@ const pdfResizePage: Tool = {
   title: 'Resize PDF Pages',
   description: 'Change all pages to A4, A3, US Letter, or a custom size - keeping content centered.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="3" y="3" width="18" height="18" rx="2"/>
-    <polyline points="15 3 21 3 21 9"/>
-    <polyline points="9 21 3 21 3 15"/>
-    <line x1="21" y1="3" x2="14" y2="10"/>
-    <line x1="3"  y1="21" x2="10" y2="14"/>
+    <rect x="4" y="2" width="16" height="20" rx="1"/>
+    <polyline points="8 2 4 2 4 6"/>
+    <polyline points="16 2 20 2 20 6"/>
+    <polyline points="8 22 4 22 4 18"/>
+    <polyline points="16 22 20 22 20 18"/>
   </svg>`,
   color: '#42A5F5',
   category: 'pdf',

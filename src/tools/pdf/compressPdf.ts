@@ -5,10 +5,10 @@ const compressPdf: Tool = {
   title: 'Compress PDF',
   description: 'Reduce PDF file size by re-rendering pages at lower quality.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
     <polyline points="14 2 14 8 20 8"/>
-    <path d="m8 17 2-2 2 2 2-2 2 2"/>
-    <polyline points="7 10 12 15 17 10"/>
+    <polyline points="8 14 12 17 16 14"/>
+    <polyline points="8 17 12 14 16 17"/>
   </svg>`,
   color: '#43A047',
   category: 'pdf',

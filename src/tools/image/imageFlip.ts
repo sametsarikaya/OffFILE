@@ -5,9 +5,13 @@ const imageFlip: Tool = {
   title: 'Flip Image',
   description: 'Mirror your image horizontally or vertically.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M8 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3"/>
-    <path d="M16 3h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-3"/>
-    <line x1="12" y1="3" x2="12" y2="21"/>
+    <rect x="2" y="4" width="8" height="14" rx="1"/>
+    <circle cx="6" cy="8" r="1"/>
+    <path d="M2 18l3-3.5 3 3.5"/>
+    <rect x="14" y="4" width="8" height="14" rx="1"/>
+    <circle cx="18" cy="8" r="1"/>
+    <path d="M22 18l-3-3.5-3 3.5"/>
+    <line x1="12" y1="3" x2="12" y2="21" stroke-dasharray="3 2"/>
   </svg>`,
   color: '#26C6DA',
   category: 'image',

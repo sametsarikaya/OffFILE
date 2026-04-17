@@ -6,8 +6,11 @@ const rotatePdf: Tool = {
   title: 'Rotate PDF',
   description: 'Rotate all pages of a PDF by 90°, 180°, or 270°.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21.5 2v6h-6"/>
-    <path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/>
+    <path d="M14 2H6a2 2 0 0 0-2 2v7"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <path d="M20 8v4"/>
+    <path d="M2 14a7 7 0 1 0 7-7"/>
+    <polyline points="4 10 2 14 6 14"/>
   </svg>`,
   color: '#F57C00',
   category: 'pdf',

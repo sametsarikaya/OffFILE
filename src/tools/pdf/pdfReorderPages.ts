@@ -44,11 +44,12 @@ const pdfReorderPages: Tool = {
   title: 'Reorder PDF Pages',
   description: 'Drag page thumbnails to reorder, then process.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <line x1="3"  y1="6"  x2="21" y2="6"/>
-    <line x1="3"  y1="12" x2="21" y2="12"/>
-    <line x1="3"  y1="18" x2="21" y2="18"/>
-    <polyline points="8 9 5 6 2 9"/>
-    <polyline points="8 15 5 18 2 15"/>
+    <path d="M3 6h13"/>
+    <path d="M3 12h13"/>
+    <path d="M3 18h9"/>
+    <path d="M19 3l3 3-3 3"/>
+    <path d="M19 21l3-3-3-3"/>
+    <line x1="22" y1="6" x2="22" y2="18"/>
   </svg>`,
   color: '#0277BD',
   category: 'pdf',
