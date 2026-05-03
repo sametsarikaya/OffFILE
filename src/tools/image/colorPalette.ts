@@ -13,7 +13,7 @@ const colorPalette: Tool = {
   </svg>`,
   color: '#EC407A',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.avif,.heic,.heif',
   multiple: false,
   resultType: 'color-palette-json',
   options: [

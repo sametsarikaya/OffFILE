@@ -14,7 +14,7 @@ const imageFilters: Tool = {
   </svg>`,
   color: '#AB47BC',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.avif,.heic,.heif',
   multiple: false,
   options: [
     {

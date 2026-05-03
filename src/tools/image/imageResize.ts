@@ -13,7 +13,7 @@ const imageResize: Tool = {
   </svg>`,
   color: '#9C27B0',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.avif,.heic,.heif',
   multiple: false,
   options: [
     {

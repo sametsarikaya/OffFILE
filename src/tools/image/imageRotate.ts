@@ -13,7 +13,7 @@ const imageRotate: Tool = {
   </svg>`,
   color: '#FFA726',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.avif,.heic,.heif',
   multiple: false,
   options: [
     {

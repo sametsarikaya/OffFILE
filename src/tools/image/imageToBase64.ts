@@ -14,7 +14,7 @@ const imageToBase64: Tool = {
   </svg>`,
   color: '#7E57C2',
   category: 'convert',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.svg,.gif',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.svg,.gif,.avif,.heic,.heif',
   multiple: false,
   options: [
     {

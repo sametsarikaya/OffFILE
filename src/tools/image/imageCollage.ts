@@ -13,7 +13,7 @@ const imageCollage: Tool = {
   </svg>`,
   color: '#8E24AA',
   category: 'image',
-  acceptedTypes: '.jpg,.jpeg,.png,.webp,.gif',
+  acceptedTypes: '.jpg,.jpeg,.png,.webp,.gif,.avif,.heic,.heif',
   multiple: true,
   maxWarnBytes: 50 * 1024 * 1024,
   options: [

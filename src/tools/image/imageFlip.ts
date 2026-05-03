@@ -15,7 +15,7 @@ const imageFlip: Tool = {
   </svg>`,
   color: '#26C6DA',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.avif,.heic,.heif',
   multiple: false,
   options: [
     {

@@ -12,7 +12,7 @@ const imageGrayscale: Tool = {
   </svg>`,
   color: '#78909C',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.avif,.heic,.heif',
   multiple: false,
 };
 

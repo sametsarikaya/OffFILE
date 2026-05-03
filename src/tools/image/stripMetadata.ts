@@ -58,7 +58,7 @@ const stripMetadata: Tool = {
   </svg>`,
   color: '#546E7A',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.avif,.heic,.heif',
   multiple: false,
 
   async renderInteractivePanel(files, _options): Promise<HTMLElement> {

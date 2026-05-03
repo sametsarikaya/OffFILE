@@ -13,7 +13,7 @@ const imageWatermark: Tool = {
   </svg>`,
   color: '#FF7043',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.avif,.heic,.heif',
   multiple: false,
   options: [
     { id: 'text',    label: 'Watermark text', type: 'text',   defaultValue: 'CONFIDENTIAL', placeholder: 'e.g. DRAFT, SAMPLE' },

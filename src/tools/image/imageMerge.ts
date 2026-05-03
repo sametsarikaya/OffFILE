@@ -18,7 +18,7 @@ const imageMerge: Tool = {
   </svg>`,
   color: '#5C6BC0',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.avif,.heic,.heif',
   multiple: true,
   options: [
     {

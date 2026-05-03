@@ -11,7 +11,7 @@ const imageCrop: Tool = {
   </svg>`,
   color: '#00ACC1',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.avif,.heic,.heif',
   multiple: false,
   maxWarnBytes: 50 * 1024 * 1024,
 

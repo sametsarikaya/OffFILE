@@ -16,7 +16,7 @@ const imageConvert: Tool = {
   </svg>`,
   color: '#2196F3',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.svg',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.bmp,.svg,.avif,.heic,.heif',
   multiple: false,
   maxWarnBytes: 50 * 1024 * 1024,
   options: [

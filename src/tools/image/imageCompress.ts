@@ -13,7 +13,7 @@ const imageCompress: Tool = {
   </svg>`,
   color: '#FF9800',
   category: 'image',
-  acceptedTypes: '.png,.jpg,.jpeg,.webp',
+  acceptedTypes: '.png,.jpg,.jpeg,.webp,.avif,.heic,.heif',
   multiple: false,
   options: [
     {
