@@ -13,7 +13,7 @@ const imageToBase64: Tool = {
     <line x1="18.5" y1="9" x2="19.5" y2="15"/>
   </svg>`,
   color: '#7E57C2',
-  category: 'image',
+  category: 'convert',
   acceptedTypes: '.png,.jpg,.jpeg,.webp,.svg,.gif',
   multiple: false,
   options: [

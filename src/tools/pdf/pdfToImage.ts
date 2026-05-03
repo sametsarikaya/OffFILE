@@ -42,7 +42,7 @@ const pdfToImage: Tool = {
     <path d="M14 16l2.5-3 2 2 2-2.5 1.5 3.5"/>
   </svg>`,
   color: '#6A1B9A',
-  category: 'pdf',
+  category: 'convert',
   acceptedTypes: '.pdf',
   multiple: false,
   options: [

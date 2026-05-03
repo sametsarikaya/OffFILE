@@ -13,7 +13,7 @@ const pdfToText: Tool = {
     <line x1="15" y1="14" x2="20" y2="14"/>
   </svg>`,
   color: '#5D4037',
-  category: 'pdf',
+  category: 'convert',
   acceptedTypes: '.pdf',
   multiple: false,
 };

@@ -14,7 +14,7 @@ const imageToPdf: Tool = {
     <path d="M17 2h3a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-8a1 1 0 0 1-1-1V11"/>
   </svg>`,
   color: '#D84315',
-  category: 'image',
+  category: 'convert',
   acceptedTypes: '.png,.jpg,.jpeg,.webp',
   multiple: true,
   options: [
