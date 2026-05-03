@@ -19,15 +19,6 @@ const pdfUnlock: Tool = {
   category: 'pdf',
   acceptedTypes: '.pdf',
   multiple: false,
-  options: [
-    {
-      id: 'password',
-      label: 'Current Password (leave blank if unencrypted)',
-      type: 'text',
-      defaultValue: '',
-      placeholder: 'Enter current password...',
-    },
-  ],
 };
 
 export default pdfUnlock;
