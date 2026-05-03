@@ -435,7 +435,7 @@ function callDownloadCleanup(): void {
 
 function renderDropState(tool: Tool, workArea: HTMLElement): void {
   callDownloadCleanup();
-  workArea.innerHTML = '';
+  while (workArea.firstChild) workArea.removeChild(workArea.firstChild);
   // Reset state
   selectedFiles = [];
   currentOptions = {};
@@ -444,6 +444,11 @@ function renderDropState(tool: Tool, workArea: HTMLElement): void {
     tool.options.forEach((opt) => {
       currentOptions[opt.id] = opt.defaultValue;
     });
+  }
+
+  if (tool.skipDropZone) {
+    workArea.appendChild(buildProcessBtnRow(tool, workArea));
+    return;
   }
 
   const dropZone = createDropZone({
@@ -621,13 +626,12 @@ async function runProcess(tool: Tool, workArea: HTMLElement): Promise<void> {
 
     const comparison = getComparisonData(tool.id, inputTotalBytes, result.blob.size);
     const additionalDownloads = await extractZipEntries(result.blob, result.filename);
+    const renderAgain = tool.skipDropZone
+      ? () => renderDropState(tool, workArea)
+      : () => renderFilesSelected(tool, workArea);
     const { cleanup } = showDownload(workArea, result.blob, result.filename, {
-      onRestart: () => {
-        renderDropState(tool, workArea);
-      },
-      onProcessAgain: () => {
-        renderFilesSelected(tool, workArea);
-      },
+      onRestart: () => renderDropState(tool, workArea),
+      onProcessAgain: renderAgain,
       comparison,
       canCopyText: isTextOutput(result.blob, result.filename),
       additionalDownloads,
@@ -637,8 +641,11 @@ async function runProcess(tool: Tool, workArea: HTMLElement): Promise<void> {
   } catch (err) {
     if (err instanceof Error && err.message === 'Cancelled') return;
     const message = err instanceof Error ? err.message : 'An unknown error occurred.';
+    const renderAgain = tool.skipDropZone
+      ? () => renderDropState(tool, workArea)
+      : () => renderFilesSelected(tool, workArea);
     showError(workArea, message, {
-      onRetry: () => renderFilesSelected(tool, workArea),
+      onRetry: renderAgain,
       onRestart: () => renderDropState(tool, workArea),
     });
   }

@@ -44,6 +44,9 @@ export interface Tool {
     options: Record<string, unknown>
   ) => Promise<HTMLElement>;
 
+  /** When true, tool page skips the drop zone (e.g. QR code has no file input) */
+  skipDropZone?: boolean;
+
   /** Legacy fallback - worker handles processing for all tools */
   process?: (
     files: File[],

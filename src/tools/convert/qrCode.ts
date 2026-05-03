@@ -21,6 +21,7 @@ const qrCode: Tool = {
   category: 'convert',
   acceptedTypes: '',
   multiple: false,
+  skipDropZone: true,
   options: [
     {
       id: 'text',

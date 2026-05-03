@@ -9,13 +9,11 @@ import rotatePdf       from './pdf/rotatePdf';
 import watermarkPdf    from './pdf/watermarkPdf';
 import pageNumbersPdf  from './pdf/pageNumbersPdf';
 import compressPdf     from './pdf/compressPdf';
-import pdfToImage      from './pdf/pdfToImage';
-import pdfToText       from './pdf/pdfToText';
 import pdfMetadata     from './pdf/pdfMetadata';
 import pdfReorderPages from './pdf/pdfReorderPages';
 import pdfAddBlank     from './pdf/pdfAddBlank';
 import pdfResizePage   from './pdf/pdfResizePage';
-// pdfLock and pdfUnlock removed — pdf-lib does not support encryption
+import pdfUnlock       from './pdf/pdfUnlock';
 
 // Image Tools
 import imageConvert   from './image/imageConvert';
@@ -29,11 +27,19 @@ import imageGrayscale from './image/imageGrayscale';
 import imageAddBg     from './image/imageAddBg';
 import imageMerge     from './image/imageMerge';
 import stripMetadata  from './image/stripMetadata';
-import imageToPdf     from './image/imageToPdf';
-import imageToBase64  from './image/imageToBase64';
 import colorPalette   from './image/colorPalette';
 import imageCrop      from './image/imageCrop';
 import imageCollage   from './image/imageCollage';
+
+// Convert Tools
+import pdfToImage    from './pdf/pdfToImage';
+import pdfToText     from './pdf/pdfToText';
+import imageToPdf    from './image/imageToPdf';
+import imageToBase64 from './image/imageToBase64';
+import svgToPng      from './convert/svgToPng';
+import createZip     from './convert/createZip';
+import extractZip    from './convert/extractZip';
+import qrCode        from './convert/qrCode';
 
 const tools: Tool[] = [
   // PDF
@@ -45,12 +51,11 @@ const tools: Tool[] = [
   watermarkPdf,
   pageNumbersPdf,
   compressPdf,
-  pdfToImage,
-  pdfToText,
   pdfMetadata,
   pdfReorderPages,
   pdfAddBlank,
   pdfResizePage,
+  pdfUnlock,
   // Image
   imageConvert,
   imageCompress,
@@ -63,11 +68,18 @@ const tools: Tool[] = [
   imageAddBg,
   imageMerge,
   stripMetadata,
-  imageToPdf,
-  imageToBase64,
   colorPalette,
   imageCrop,
   imageCollage,
+  // Convert
+  pdfToImage,
+  pdfToText,
+  imageToPdf,
+  imageToBase64,
+  svgToPng,
+  createZip,
+  extractZip,
+  qrCode,
 ];
 
 export function getAllTools(): Tool[] { return tools; }
@@ -81,6 +93,7 @@ export function getToolsByCategory(category: Tool['category']): Tool[] {
 }
 
 export const categories: { id: Tool['category']; label: string; short: string }[] = [
-  { id: 'pdf',   label: 'PDF Tools',   short: 'PDF'   },
-  { id: 'image', label: 'Image Tools', short: 'IMAGE' },
+  { id: 'pdf',     label: 'PDF Tools',     short: 'PDF'     },
+  { id: 'image',   label: 'Image Tools',   short: 'IMAGE'   },
+  { id: 'convert', label: 'Convert Tools', short: 'CONVERT' },
 ];
