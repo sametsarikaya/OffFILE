@@ -8,6 +8,9 @@ export default defineConfig({
     outDir: 'dist',
     emptyOutDir: true,
   },
+  worker: {
+    format: 'es',
+  },
   server: {
     port: 3000,
     open: true,
