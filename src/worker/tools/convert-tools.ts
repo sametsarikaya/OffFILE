@@ -1,4 +1,4 @@
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import * as pdfjsLib from 'pdfjs-dist';
 import JSZip from 'jszip';
 import { OffscreenCanvasFactory, loadBitmap } from '../utils';
@@ -30,6 +30,7 @@ export async function dispatch(
     case 'extract-zip':    return extractZip(buffers, fileNames, onProgress);
     case 'qr-code':        return qrCode(options, onProgress);
     case 'file-hash':      return fileHash(buffers, fileNames, options, onProgress);
+    case 'text-to-pdf':    return textToPdf(buffers, fileNames, options, onProgress);
     default: throw new Error(`Unknown convert tool: ${toolId}`);
   }
 }
@@ -431,4 +432,94 @@ async function fileHash(
     ? `${fileNames[0]}.hash.txt`
     : 'file_hashes.txt';
   return { buffer, filename: outName, mime: 'text/plain' };
+}
+
+/* ============================================================
+   Text to PDF
+   Renders plain text files as PDF pages using pdf-lib.
+   Word-wraps lines and handles page breaks.
+   ============================================================ */
+
+const PAGE_SIZES: Record<string, [number, number]> = {
+  a4:     [595.28, 841.89],
+  letter: [612,    792],
+  a3:     [841.89, 1190.55],
+};
+
+async function textToPdf(
+  buffers: ArrayBuffer[], fileNames: string[],
+  options: Record<string, unknown>, onProgress: ProgressFn
+): Promise<ProcessResult> {
+  const pageSizeKey = String(options.pageSize || 'a4');
+  const [pageW, pageH] = PAGE_SIZES[pageSizeKey] ?? PAGE_SIZES.a4;
+  const fontSize    = Math.max(6, Math.min(36, Number(options.fontSize) || 11));
+  const marginMm    = Math.max(5, Math.min(50, Number(options.marginMm) || 20));
+  const lineHeightMul = Math.max(1, Number(options.lineHeight) || 1.5);
+
+  const MM_TO_PT = 2.8346;
+  const margin = marginMm * MM_TO_PT;
+  const lineH  = fontSize * lineHeightMul;
+  const usableW = pageW - margin * 2;
+  const usableH = pageH - margin * 2;
+
+  // Read source text
+  const decoder = new TextDecoder('utf-8', { fatal: false });
+  const rawText = decoder.decode(buffers[0]);
+
+  onProgress(10);
+
+  const doc  = await PDFDocument.create();
+  const font = await doc.embedFont(StandardFonts.Courier);
+
+  // Measure character width at given size (Courier is monospace: all chars same width)
+  const charW  = font.widthOfTextAtSize('M', fontSize);
+  const charsPerLine = Math.max(1, Math.floor(usableW / charW));
+
+  // Word-wrap: split long lines, keep short ones
+  const wrappedLines: string[] = [];
+  for (const rawLine of rawText.split('\n')) {
+    if (rawLine.length === 0) {
+      wrappedLines.push('');
+      continue;
+    }
+    let remaining = rawLine;
+    while (remaining.length > charsPerLine) {
+      // Try to break at last space within limit
+      const chunk = remaining.slice(0, charsPerLine);
+      const lastSpace = chunk.lastIndexOf(' ');
+      const breakAt = lastSpace > 0 ? lastSpace + 1 : charsPerLine;
+      wrappedLines.push(remaining.slice(0, breakAt));
+      remaining = remaining.slice(breakAt);
+    }
+    wrappedLines.push(remaining);
+  }
+
+  onProgress(40);
+
+  // Layout lines onto pages
+  let page = doc.addPage([pageW, pageH]);
+  let y = pageH - margin - fontSize;
+
+  for (const line of wrappedLines) {
+    if (y < margin) {
+      page = doc.addPage([pageW, pageH]);
+      y = pageH - margin - fontSize;
+    }
+    if (line.length > 0) {
+      page.drawText(line, {
+        x: margin,
+        y,
+        size: fontSize,
+        font,
+        color: rgb(0, 0, 0),
+      });
+    }
+    y -= lineH;
+  }
+
+  onProgress(85);
+
+  const pdfBytes = await doc.save();
+  const baseName = fileNames[0].replace(/\.[^.]+$/, '');
+  return { buffer: pdfBytes.buffer as ArrayBuffer, filename: `${baseName}.pdf`, mime: 'application/pdf' };
 }

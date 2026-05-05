@@ -41,6 +41,7 @@ import createZip     from './convert/createZip';
 import extractZip    from './convert/extractZip';
 import qrCode        from './convert/qrCode';
 import fileHash      from './convert/fileHash';
+import textToPdf     from './convert/textToPdf';
 
 const tools: Tool[] = [
   // PDF
@@ -82,6 +83,7 @@ const tools: Tool[] = [
   extractZip,
   qrCode,
   fileHash,
+  textToPdf,
 ];
 
 export function getAllTools(): Tool[] { return tools; }
