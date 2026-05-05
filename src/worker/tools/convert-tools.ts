@@ -29,6 +29,7 @@ export async function dispatch(
     case 'create-zip':     return createZip(buffers, fileNames, options, onProgress);
     case 'extract-zip':    return extractZip(buffers, fileNames, onProgress);
     case 'qr-code':        return qrCode(options, onProgress);
+    case 'file-hash':      return fileHash(buffers, fileNames, options, onProgress);
     default: throw new Error(`Unknown convert tool: ${toolId}`);
   }
 }
@@ -329,4 +330,105 @@ async function qrCode(
 
   const safeName = text.slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, '_');
   return { buffer, filename: `qr_${safeName}.png`, mime: 'image/png' };
+}
+
+/* ============================================================
+   File Hash Calculator
+   Uses WebCrypto for SHA-1/SHA-256/SHA-512, pure-JS MD5.
+   ============================================================ */
+
+function md5(buf: ArrayBuffer): string {
+  // Pure-JS MD5 (RFC 1321)
+  const data = new Uint8Array(buf);
+  const len = data.length;
+  const bitLen = len * 8;
+  // Padding
+  const padLen = ((len % 64) < 56 ? 56 - (len % 64) : 120 - (len % 64));
+  const msg = new Uint8Array(len + padLen + 8);
+  msg.set(data);
+  msg[len] = 0x80;
+  // Append length as 64-bit LE
+  const view = new DataView(msg.buffer);
+  view.setUint32(len + padLen, bitLen & 0xffffffff, true);
+  view.setUint32(len + padLen + 4, Math.floor(bitLen / 0x100000000), true);
+
+  const K = Uint32Array.from({ length: 64 }, (_, i) =>
+    Math.floor(Math.abs(Math.sin(i + 1)) * 0x100000000) >>> 0
+  );
+  const S = [
+    7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
+    5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20,
+    4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
+    6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
+  ];
+
+  let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+  const msgView = new DataView(msg.buffer);
+
+  for (let i = 0; i < msg.length; i += 64) {
+    const M = Array.from({ length: 16 }, (_, j) => msgView.getUint32(i + j * 4, true));
+    let A = a0, B = b0, C = c0, D = d0;
+    for (let j = 0; j < 64; j++) {
+      let F: number, g: number;
+      if (j < 16)      { F = (B & C) | (~B & D); g = j; }
+      else if (j < 32) { F = (D & B) | (~D & C); g = (5 * j + 1) % 16; }
+      else if (j < 48) { F = B ^ C ^ D;           g = (3 * j + 5) % 16; }
+      else             { F = C ^ (B | ~D);         g = (7 * j) % 16; }
+      F = (F + A + K[j] + M[g]) >>> 0;
+      A = D; D = C; C = B;
+      const s = S[j];
+      B = (B + ((F << s) | (F >>> (32 - s)))) >>> 0;
+    }
+    a0 = (a0 + A) >>> 0; b0 = (b0 + B) >>> 0;
+    c0 = (c0 + C) >>> 0; d0 = (d0 + D) >>> 0;
+  }
+
+  const toLE = (n: number) => {
+    const b = [];
+    for (let i = 0; i < 4; i++) { b.push((n >>> (i * 8)) & 0xff); }
+    return b;
+  };
+  return [...toLE(a0), ...toLE(b0), ...toLE(c0), ...toLE(d0)]
+    .map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function sha(algo: AlgorithmIdentifier, buf: ArrayBuffer): Promise<string> {
+  const digest = await crypto.subtle.digest(algo, buf);
+  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function fileHash(
+  buffers: ArrayBuffer[], fileNames: string[],
+  options: Record<string, unknown>, onProgress: ProgressFn
+): Promise<ProcessResult> {
+  const algo = String(options.algorithm || 'SHA-256');
+  const lines: string[] = [];
+
+  const step = 100 / buffers.length;
+  for (let i = 0; i < buffers.length; i++) {
+    const buf  = buffers[i];
+    const name = fileNames[i];
+    lines.push(`File: ${name}`);
+
+    if (algo === 'ALL') {
+      lines.push(`  MD5:     ${md5(buf)}`);
+      lines.push(`  SHA-1:   ${await sha('SHA-1', buf)}`);
+      lines.push(`  SHA-256: ${await sha('SHA-256', buf)}`);
+      lines.push(`  SHA-512: ${await sha('SHA-512', buf)}`);
+    } else if (algo === 'MD5') {
+      lines.push(`  MD5: ${md5(buf)}`);
+    } else {
+      lines.push(`  ${algo}: ${await sha(algo as AlgorithmIdentifier, buf)}`);
+    }
+    lines.push('');
+    onProgress((i + 1) * step);
+  }
+
+  const text = lines.join('\n').trim();
+  const encoder = new TextEncoder();
+  const buffer = encoder.encode(text).buffer as ArrayBuffer;
+  const outName = buffers.length === 1
+    ? `${fileNames[0]}.hash.txt`
+    : 'file_hashes.txt';
+  return { buffer, filename: outName, mime: 'text/plain' };
 }

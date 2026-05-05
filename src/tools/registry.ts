@@ -40,6 +40,7 @@ import svgToPng      from './convert/svgToPng';
 import createZip     from './convert/createZip';
 import extractZip    from './convert/extractZip';
 import qrCode        from './convert/qrCode';
+import fileHash      from './convert/fileHash';
 
 const tools: Tool[] = [
   // PDF
@@ -80,6 +81,7 @@ const tools: Tool[] = [
   createZip,
   extractZip,
   qrCode,
+  fileHash,
 ];
 
 export function getAllTools(): Tool[] { return tools; }

@@ -19,7 +19,7 @@ const IMAGE_TOOLS = new Set([
 
 const CONVERT_TOOLS = new Set([
   'pdf-to-image', 'pdf-to-text', 'image-to-pdf', 'image-to-base64',
-  'svg-to-png', 'create-zip', 'extract-zip', 'qr-code',
+  'svg-to-png', 'create-zip', 'extract-zip', 'qr-code', 'file-hash',
 ]);
 
 /* ---- Zod option schemas ---- */
@@ -150,6 +150,9 @@ const schemas: Record<string, z.ZodTypeAny> = {
     errorLevel:  z.enum(['L', 'M', 'Q', 'H']).optional().default('M'),
     darkColor:   z.string().optional().default('#000000'),
     lightColor:  z.string().optional().default('#ffffff'),
+  }),
+  'file-hash': z.object({
+    algorithm: z.enum(['SHA-256', 'SHA-512', 'SHA-1', 'MD5', 'ALL']).optional().default('SHA-256'),
   }),
 };
 
