@@ -94,7 +94,8 @@ export async function runToolBatch(
   toolId: string,
   files: File[],
   options: Record<string, unknown>,
-  onProgress: ProgressCallback
+  onProgress: ProgressCallback,
+  onFileProgress?: (done: number, total: number) => void
 ): Promise<{ blob: Blob; filename: string }[]> {
   const total = files.length;
   if (total === 0) return [];
@@ -113,6 +114,8 @@ export async function runToolBatch(
     for (const s of wp) completed += s.done + s.current / 100;
     onProgress((completed / total) * 100);
   }
+
+  let totalFilesCompleted = 0;
 
   const groupResults = await Promise.all(
     groups.map(async (entries, wi) => {
@@ -134,7 +137,9 @@ export async function runToolBatch(
         });
         wp[wi].done++;
         wp[wi].current = 0;
+        totalFilesCompleted++;
         aggregateProgress();
+        onFileProgress?.(totalFilesCompleted, total);
         results.push({ idx, blob: new Blob([result.buffer], { type: result.mime }), filename: result.filename });
       }
       return results;

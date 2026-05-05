@@ -657,16 +657,22 @@ async function runBatchProcess(tool: Tool, workArea: HTMLElement): Promise<void>
   const inputTotalBytes = files.reduce((acc, file) => acc + file.size, 0);
   let cancelled = false;
 
-  const { updateProgress } = showProcessing(workArea, () => {
+  const { updateProgress, updateStatus } = showProcessing(workArea, () => {
     cancelled = true;
     cancelCurrentTool();
     renderDropState(tool, workArea);
   });
 
+  const total = files.length;
+  updateStatus(`Processing file 1 of ${total}...`);
+
   try {
     await delay(300);
     const results = await runToolBatch(tool.id, files, options, (percent) => {
       updateProgress(percent);
+    }, (done, tot) => {
+      if (done < tot) updateStatus(`Processing file ${done + 1} of ${tot}...`);
+      else updateStatus('Packaging results...');
     });
 
     if (cancelled) return;

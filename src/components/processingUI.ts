@@ -24,6 +24,7 @@ export function showProcessing(
   onCancel?: () => void
 ): {
   updateProgress: (percent: number) => void;
+  updateStatus: (text: string) => void;
 } {
   container.innerHTML = `
     <div class="processing" id="processing-state">
@@ -52,12 +53,15 @@ export function showProcessing(
   const progressStatus = container.querySelector('#processing-status') as HTMLElement;
   const progressPercent = container.querySelector('#progress-percent') as HTMLElement;
 
+  let customStatus: string | null = null;
+
   return {
     updateProgress: (percent: number) => {
       const clamped = Math.min(100, Math.max(0, percent));
       progressBar.style.width = `${clamped}%`;
       progressPercent.textContent = `${Math.round(clamped)}%`;
 
+      if (customStatus !== null) return;
       if (clamped < 20) {
         progressStatus.textContent = 'Starting...';
       } else if (clamped < 45) {
@@ -69,6 +73,10 @@ export function showProcessing(
       } else {
         progressStatus.textContent = 'Done';
       }
+    },
+    updateStatus: (text: string) => {
+      customStatus = text;
+      progressStatus.textContent = text;
     },
   };
 }
