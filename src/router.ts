@@ -8,6 +8,7 @@ import { getAllTools, getToolById, getToolsByCategory, categories } from './tool
 import { runTool, runToolBatch, cancelCurrentTool } from './worker/workerClient';
 import { escapeHtml } from './utils/escapeHtml';
 import { getFavoriteIds, isFavorite, toggleFavorite } from './utils/favorites';
+import { recordRecentTool, getRecentToolIds } from './utils/recentTools';
 import type { Tool } from './types';
 import JSZip from 'jszip';
 
@@ -149,6 +150,37 @@ function renderHome(): void {
     if (toolId) syncStarButtons(toolId);
   });
 
+  // Recently Used section
+  const recentSlot = document.createElement('div');
+  recentSlot.id = 'recent-slot';
+  container.appendChild(recentSlot);
+
+  const recentIds = getRecentToolIds();
+  if (recentIds.length > 0) {
+    const recentTools = recentIds
+      .map((id) => getToolById(id))
+      .filter((t): t is Tool => t !== undefined);
+
+    if (recentTools.length > 0) {
+      const section = document.createElement('section');
+      section.className = 'category-section recent-section';
+      section.id = 'category-recent';
+
+      const heading = document.createElement('h2');
+      heading.className = 'category-section__title recent-section__title';
+      heading.innerHTML = `
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Recently Used
+      `;
+      section.appendChild(heading);
+      section.appendChild(createToolGrid(recentTools));
+      recentSlot.appendChild(section);
+    }
+  }
+
   // Categorized Tool Grids
   const allCatSections: HTMLElement[] = [];
   categories.forEach((cat) => {
@@ -255,6 +287,7 @@ function renderHome(): void {
 
     if (!q) {
       favoritesSlot.style.display = '';
+      recentSlot.style.display = '';
       allCatSections.forEach((s) => { s.style.display = ''; });
       if ((window.location.hash || '#/') !== '#/') {
         window.history.replaceState(null, '', '#/');
@@ -267,6 +300,7 @@ function renderHome(): void {
     }
 
     favoritesSlot.style.display = 'none';
+    recentSlot.style.display = 'none';
     allCatSections.forEach((s) => { s.style.display = 'none'; });
 
     const matched = getAllTools().filter(
@@ -637,6 +671,7 @@ async function runProcess(tool: Tool, workArea: HTMLElement): Promise<void> {
       additionalDownloads,
       enableShare: true,
     });
+    recordRecentTool(tool.id);
     downloadCleanup = cleanup;
   } catch (err) {
     if (err instanceof Error && err.message === 'Cancelled') return;
@@ -697,6 +732,7 @@ async function runBatchProcess(tool: Tool, workArea: HTMLElement): Promise<void>
       additionalDownloads: results,
       enableShare: true,
     });
+    recordRecentTool(tool.id);
     downloadCleanup = batchCleanup;
   } catch (err) {
     if (cancelled || (err instanceof Error && err.message === 'Cancelled')) return;
