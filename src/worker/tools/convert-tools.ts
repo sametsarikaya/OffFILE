@@ -31,6 +31,7 @@ export async function dispatch(
     case 'qr-code':        return qrCode(options, onProgress);
     case 'file-hash':      return fileHash(buffers, fileNames, options, onProgress);
     case 'text-to-pdf':    return textToPdf(buffers, fileNames, options, onProgress);
+    case 'favicon-generator': return faviconGenerator(buffers, fileNames, fileMimes, options, onProgress);
     default: throw new Error(`Unknown convert tool: ${toolId}`);
   }
 }
@@ -522,4 +523,81 @@ async function textToPdf(
   const pdfBytes = await doc.save();
   const baseName = fileNames[0].replace(/\.[^.]+$/, '');
   return { buffer: pdfBytes.buffer as ArrayBuffer, filename: `${baseName}.pdf`, mime: 'application/pdf' };
+}
+
+/* ============================================================
+   Favicon Generator
+   Resizes a source image to multiple standard sizes using
+   OffscreenCanvas. Outputs a ZIP with all PNGs/WebPs plus
+   a minimal HTML <link> snippet.
+   ============================================================ */
+
+const SIZE_SETS: Record<string, number[]> = {
+  standard: [16, 32, 48, 64, 128, 180, 192, 512],
+  minimal:  [16, 32, 192, 512],
+  apple:    [57, 60, 72, 76, 114, 120, 144, 152, 180],
+};
+
+async function faviconGenerator(
+  buffers: ArrayBuffer[], fileNames: string[], fileMimes: string[],
+  options: Record<string, unknown>, onProgress: ProgressFn
+): Promise<ProcessResult> {
+  const fmt = String(options.format || 'png') === 'webp' ? 'image/webp' : 'image/png';
+  const ext = fmt === 'image/webp' ? 'webp' : 'png';
+  const sizeSet = String(options.includeSizes || 'standard');
+  const sizes = SIZE_SETS[sizeSet] ?? SIZE_SETS.standard;
+
+  // Load source image as ImageBitmap
+  const mime = fileMimes[0] || 'image/png';
+  const srcBlob = new Blob([buffers[0]], { type: mime });
+  const bitmap = await createImageBitmap(srcBlob);
+  onProgress(15);
+
+  const zip = new JSZip();
+  const linkTags: string[] = [];
+  const step = 70 / sizes.length;
+
+  for (let i = 0; i < sizes.length; i++) {
+    const size = sizes[i];
+    const canvas = new OffscreenCanvas(size, size);
+    const ctx = canvas.getContext('2d')!;
+    ctx.drawImage(bitmap, 0, 0, size, size);
+    const blob = await canvas.convertToBlob({ type: fmt, quality: 0.95 });
+    const buf  = await blob.arrayBuffer();
+
+    const fileName = `favicon-${size}x${size}.${ext}`;
+    zip.file(fileName, buf);
+
+    // Generate appropriate <link> tags
+    if (size === 16 || size === 32 || size === 48) {
+      linkTags.push(`<link rel="icon" type="image/${ext}" sizes="${size}x${size}" href="${fileName}">`);
+    } else if (size === 180) {
+      linkTags.push(`<link rel="apple-touch-icon" sizes="${size}x${size}" href="${fileName}">`);
+    } else if (size === 192 || size === 512) {
+      linkTags.push(`<!-- PWA manifest icon: ${size}x${size} → add to manifest.json -->`);
+    } else {
+      linkTags.push(`<link rel="apple-touch-icon" sizes="${size}x${size}" href="${fileName}">`);
+    }
+
+    onProgress(15 + (i + 1) * step);
+  }
+
+  bitmap.close();
+
+  // Add a README with the HTML snippet
+  const baseName = fileNames[0].replace(/\.[^.]+$/, '');
+  const readme = [
+    `# Favicon Set — generated from ${fileNames[0]}`,
+    '',
+    'Add these tags to your <head>:',
+    '',
+    ...linkTags,
+    '',
+    'For PWA support, also add the 192×192 and 512×512 icons to your manifest.json.',
+  ].join('\n');
+  zip.file('README.md', readme);
+
+  onProgress(95);
+  const zipBuf = await zip.generateAsync({ type: 'arraybuffer', compression: 'DEFLATE' });
+  return { buffer: zipBuf, filename: `${baseName}_favicons.zip`, mime: 'application/zip' };
 }

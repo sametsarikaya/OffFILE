@@ -19,7 +19,7 @@ const IMAGE_TOOLS = new Set([
 
 const CONVERT_TOOLS = new Set([
   'pdf-to-image', 'pdf-to-text', 'image-to-pdf', 'image-to-base64',
-  'svg-to-png', 'create-zip', 'extract-zip', 'qr-code', 'file-hash', 'text-to-pdf',
+  'svg-to-png', 'create-zip', 'extract-zip', 'qr-code', 'file-hash', 'text-to-pdf', 'favicon-generator',
 ]);
 
 /* ---- Zod option schemas ---- */
@@ -159,6 +159,10 @@ const schemas: Record<string, z.ZodTypeAny> = {
     fontSize:   z.coerce.number().int().min(6).max(36).optional().default(11),
     marginMm:   z.coerce.number().int().min(5).max(50).optional().default(20),
     lineHeight: z.coerce.number().min(1).max(3).optional().default(1.5),
+  }),
+  'favicon-generator': z.object({
+    format:       z.enum(['png', 'webp']).optional().default('png'),
+    includeSizes: z.enum(['standard', 'minimal', 'apple']).optional().default('standard'),
   }),
 };
 

@@ -42,6 +42,7 @@ import extractZip    from './convert/extractZip';
 import qrCode        from './convert/qrCode';
 import fileHash      from './convert/fileHash';
 import textToPdf     from './convert/textToPdf';
+import faviconGenerator from './convert/faviconGenerator';
 
 const tools: Tool[] = [
   // PDF
@@ -84,6 +85,7 @@ const tools: Tool[] = [
   qrCode,
   fileHash,
   textToPdf,
+  faviconGenerator,
 ];
 
 export function getAllTools(): Tool[] { return tools; }
