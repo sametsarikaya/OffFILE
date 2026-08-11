@@ -6,6 +6,13 @@ dist/
 dist-ssr/
 *.local
 
+# Test output
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+
 # Environment & secrets
 .env
 .env.local
@@ -43,7 +50,8 @@ CLAUDE.md
 .cursorrules
 .aider*
 .copilot/
-.github/
+.github/copilot-instructions.md
+.github/instructions/
 .windsurf/
 .codeium/
 .continue/
