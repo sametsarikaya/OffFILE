@@ -1,12 +1,22 @@
 {
   "name": "offfile",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "Privacy-first browser-based file tools. No uploads, no servers, 100% offline.",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "e2e": "playwright test",
+    "verify": "npm run typecheck && npm run lint && npm run test"
   },
   "keywords": [
     "file-tools",
@@ -19,9 +29,20 @@
   "author": "Samet SARIKAYA",
   "license": "AGPL-3.0-only",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^10.8.1",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.10.0",
+    "jsdom": "^30.0.1",
+    "prettier": "^3.9.6",
     "typescript": "^5.8.3",
+    "typescript-eslint": "^8.67.0",
     "vite": "^6.3.2",
-    "vite-plugin-pwa": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.1.10"
   },
   "dependencies": {
     "jspdf": "^4.2.1",
