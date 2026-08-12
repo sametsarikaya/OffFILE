@@ -1,10 +1,10 @@
 # OffFile
 
 [![AGPLv3 License](https://img.shields.io/badge/license-AGPLv3-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.9.0-lightgrey.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-0.10.1-lightgrey.svg)](package.json)
 [![Site](https://img.shields.io/badge/site-offfile.sametsarikaya.com-red.svg)](https://offfile.sametsarikaya.com)
 
-30 file tools that run entirely in your browser. No uploads, no accounts, no server.
+38 file tools that run entirely in your browser. No uploads, no accounts, no server.
 
 **[offfile.sametsarikaya.com](https://offfile.sametsarikaya.com)** - no install required.
 
@@ -22,9 +22,11 @@ Most online file tools send your files to a server. They have to - that's where 
 
 ## Tools
 
-**PDF (14)** - Merge, Split, Compress, Rotate, Watermark, Add Page Numbers, Reorder Pages, Extract Pages, Remove Pages, PDF to Image, PDF to Text, PDF Metadata, Resize Pages, Add Blank Page
+**PDF (13)** - Merge, Split, Extract Pages, Remove Pages, Rotate, Watermark, Add Page Numbers, Compress, Metadata, Reorder Pages, Add Blank Page, Resize Pages, Unlock
 
-**Image (16)** - Convert, Compress, Resize, Rotate, Flip, Crop, Watermark, Filters, Grayscale, Add Background, Merge/Stack, Strip Metadata, Image to PDF, Image to Base64, Color Palette, Collage
+**Image (14)** - Convert, Compress, Resize, Rotate, Flip, Watermark, Filters, Grayscale, Add Background, Merge/Stack, Strip Metadata, Color Palette, Crop, Collage
+
+**Convert (11)** - PDF to Image, PDF to Text, Image to PDF, Image to Base64, SVG to PNG/JPG, Create ZIP, Extract ZIP, QR Code Generator, File Hash, Text to PDF, Favicon Generator
 
 ## Stack
 
@@ -32,6 +34,7 @@ Most online file tools send your files to a server. They have to - that's where 
 - pdf-lib and pdfjs-dist for PDF
 - Canvas API for image processing
 - Web Workers for off-main-thread processing
+- Zod for option validation at the worker boundary
 
 No frameworks. No backend.
 
@@ -47,6 +50,24 @@ Build:
 ```sh
 npm run build
 ```
+
+## Development
+
+```sh
+npm run verify        # typecheck + lint + unit tests
+npm run typecheck     # tsc --noEmit
+npm run lint          # ESLint
+npm run format        # Prettier (write)
+npm test              # Vitest unit tests
+npm run test:coverage # Vitest with coverage
+npm run e2e           # Playwright end-to-end tests
+```
+
+E2E tests build the app and run it against a preview server, so the first run
+takes longer. Playwright needs its browser once: `npx playwright install chromium`.
+
+CI runs typecheck, lint, format check, unit tests, a production build and the
+E2E suite on every push and pull request.
 
 ## Privacy
 

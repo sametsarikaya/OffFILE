@@ -13,8 +13,8 @@ test.describe('home page', () => {
   });
 
   test('lists every registered tool as a card', async ({ page }) => {
-    // Registry currently holds 37 tools; the count must never silently drop.
-    expect(await page.locator('.tool-card').count()).toBeGreaterThanOrEqual(37);
+    // Registry currently holds 38 tools; the count must never silently drop.
+    expect(await page.locator('.tool-card').count()).toBeGreaterThanOrEqual(38);
   });
 
   test('filters tools by search and reflects the query in the URL', async ({ page }) => {
