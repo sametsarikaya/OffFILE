@@ -1,0 +1,276 @@
+/* Metadata panels and download restart row */
+
+/* === Metadata Panel (Strip Metadata tool preview) === */
+.metadata-panel {
+  border: var(--border);
+  background: var(--color-white);
+  box-shadow: var(--shadow);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.metadata-panel__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-md);
+  border-bottom: 2px solid var(--color-border);
+}
+
+.metadata-panel__title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metadata-panel__subtitle {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.metadata-panel__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+  font-family: var(--font-mono);
+}
+
+.metadata-panel__table th {
+  text-align: left;
+  padding: 6px 10px;
+  background: var(--color-border);
+  color: var(--color-bg);
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.metadata-panel__table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 18%, transparent);
+  vertical-align: middle;
+  word-break: break-all;
+  color: var(--color-text-muted);
+}
+
+.metadata-panel__row--changed td {
+  background: color-mix(in srgb, #f44336 6%, transparent);
+}
+
+.metadata-panel__row--changed td:first-child {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.metadata-tag {
+  display: inline-block;
+  padding: 2px 7px;
+  background: #f44336;
+  color: #fff;
+  font-size: 0.72rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.metadata-ok {
+  display: inline-block;
+  padding: 2px 7px;
+  background: var(--color-cta);
+  color: #050508;
+  font-size: 0.72rem;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.metadata-panel__note {
+  margin-top: var(--space-md);
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .metadata-panel {
+  background: var(--color-white);
+  border-color: #2c2c2c;
+}
+[data-theme='dark'] .metadata-panel__table th {
+  background: #252525;
+  color: var(--color-text);
+}
+[data-theme='dark'] .metadata-panel__table td {
+  border-bottom-color: #2c2c2c;
+}
+[data-theme='dark'] .metadata-panel__row--changed td {
+  background: rgba(244, 67, 54, 0.1);
+}
+
+/* === PDF Metadata Edit Form === */
+.metadata-panel__mode-row {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.metadata-mode-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  user-select: none;
+}
+
+.metadata-mode-label input[type='radio'] {
+  cursor: pointer;
+  accent-color: var(--color-cta);
+  width: 15px;
+  height: 15px;
+}
+
+.metadata-panel__fields {
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.15s;
+}
+
+.metadata-field-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 7px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 20%, transparent);
+}
+
+.metadata-field-row:last-child {
+  border-bottom: none;
+}
+
+.metadata-field-row__label {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+}
+
+.metadata-field-row__input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.metadata-field-row__input {
+  flex: 1;
+  padding: 6px 10px;
+  border: var(--border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  min-width: 0;
+}
+
+.metadata-field-row__input--empty {
+  color: var(--color-text-muted);
+  border-style: dashed;
+}
+
+.metadata-field-row__input:focus {
+  outline: 2px solid var(--color-cta);
+  outline-offset: 1px;
+}
+
+.metadata-field-row__clear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  opacity: 0.55;
+  transition:
+    opacity 0.1s,
+    color 0.1s;
+  stroke: currentColor;
+}
+
+.metadata-field-row__clear:hover:not(:disabled) {
+  opacity: 1;
+  color: #f44336;
+}
+
+.metadata-field-row__clear:disabled {
+  opacity: 0.18;
+  cursor: default;
+}
+
+.metadata-panel__clear-all-row {
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 25%, transparent);
+  transition: opacity 0.15s;
+}
+
+[data-theme='dark'] .metadata-field-row__input {
+  background: var(--color-white);
+  color: var(--color-text);
+  border-color: #2c2c2c;
+}
+
+[data-theme='dark'] .metadata-field-row__input--empty {
+  color: var(--color-text-muted);
+}
+
+/* === Download Area – Restart Row (two buttons) === */
+.download-area__restart-row {
+  display: flex;
+  gap: var(--space-md);
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: var(--space-lg);
+}
+
+/* "Process Again (Same File)" button — secondary accent */
+.download-area__restart--again {
+  background: color-mix(in srgb, var(--color-accent) 18%, var(--color-bg)) !important;
+  border-color: var(--color-accent) !important;
+}
+
+.download-area__restart--again:hover {
+  background: var(--color-accent) !important;
+  color: #050508 !important;
+}
+
+[data-theme='dark'] .download-area__restart--again {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-white)) !important;
+}
+
+[data-theme='dark'] .download-area__restart--again:hover {
+  background: var(--color-accent) !important;
+  color: #050508 !important;
+}
+
+/* clr-danger token for split PDF validation */
+:root {
+  --clr-danger: #f44336;
+}
+[data-theme='dark'] {
+  --clr-danger: #ff5252;
+}

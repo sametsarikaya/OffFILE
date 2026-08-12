@@ -1,0 +1,75 @@
+/* Process button ready and loading states */
+
+/* --- Process Button --- */
+.process-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  margin-top: var(--space-xl);
+  padding: var(--space-lg) var(--space-xl);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--color-bg-alt);
+  color: var(--color-text-muted);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition:
+    transform 100ms ease,
+    box-shadow 100ms ease;
+}
+
+.process-btn--ready {
+  background: var(--color-primary);
+  color: #0f0f0f;
+}
+
+.process-btn--ready:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--process-btn-hover-shadow);
+}
+
+.process-btn--ready:active {
+  transform: translate(2px, 2px);
+  box-shadow: var(--shadow-active);
+}
+
+.process-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: var(--shadow);
+}
+
+.process-btn--loading {
+  opacity: 1;
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+}
+
+.process-btn__spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid color-mix(in srgb, var(--color-border) 22%, transparent);
+  border-top-color: var(--color-border);
+  border-radius: 999px;
+  animation: processSpin 700ms linear infinite;
+}
+
+@keyframes processSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.process-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+}

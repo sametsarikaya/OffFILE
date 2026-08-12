@@ -1,0 +1,76 @@
+/* Tool page header */
+
+/* TOOL PAGE */
+
+/* --- Tool Page Header --- */
+.tool-page {
+  opacity: 0;
+  animation: pageEntrance 0.3s ease forwards;
+}
+
+@keyframes pageEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tool-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.tool-header__back {
+  width: 48px;
+  height: 48px;
+  background: var(--color-white);
+  border: var(--border);
+  box-shadow: 4px 4px 0px var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    transform 100ms ease,
+    box-shadow 100ms ease;
+  flex-shrink: 0;
+}
+
+.tool-header__back:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px var(--color-border);
+}
+
+.tool-header__back:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px var(--color-border);
+}
+
+.tool-header__back svg {
+  width: 24px;
+  height: 24px;
+  stroke: var(--color-text);
+  fill: none;
+}
+
+.tool-header__info {
+  flex: 1;
+}
+
+.tool-header__title {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+
+.tool-header__desc {
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  margin-top: var(--space-xs);
+}

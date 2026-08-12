@@ -1,0 +1,107 @@
+/* Processing state */
+
+/* --- Processing State --- */
+.processing {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  border: var(--border);
+  background: var(--color-white);
+  box-shadow: var(--shadow);
+}
+
+.processing__spinner {
+  display: inline-flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.processing__block {
+  width: 16px;
+  height: 40px;
+  background: linear-gradient(180deg, var(--color-primary), var(--color-secondary));
+  animation: blockPulse 0.6s ease infinite alternate;
+}
+
+.processing__block:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.processing__block:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.processing__block:nth-child(4) {
+  animation-delay: 0.3s;
+}
+.processing__block:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blockPulse {
+  from {
+    transform: scaleY(0.4);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.processing__text {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.processing__status {
+  margin-top: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.processing__progress {
+  margin-top: var(--space-lg);
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 12px;
+  background: var(--color-bg-alt);
+  border: 2px solid var(--color-border);
+  overflow: hidden;
+}
+
+.processing__progress-bar {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-accent),
+    var(--color-secondary)
+  );
+  background-size: 180% 100%;
+  width: 0%;
+  transition: width 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  animation: progressShift 1200ms ease-in-out infinite;
+}
+
+.processing__percent {
+  margin-top: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+@keyframes progressShift {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 180% 0;
+  }
+}

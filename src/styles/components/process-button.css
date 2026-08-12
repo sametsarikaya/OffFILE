@@ -1,0 +1,52 @@
+/* Process button row and cancel */
+
+/* --- Process Button Row --- */
+.process-btn-row {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-xl);
+  flex-wrap: wrap;
+}
+
+.process-btn-row .process-btn {
+  flex: 1;
+  margin-top: 0;
+  min-width: 200px;
+}
+
+/* --- Cancel Button (inside processing state) --- */
+.processing__cancel {
+  margin-top: var(--space-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text);
+  cursor: pointer;
+  border: 2px solid var(--color-border);
+  box-shadow: 3px 3px 0 var(--color-border);
+  background: var(--color-bg-alt);
+  padding: 8px 14px;
+  line-height: 1;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    background 120ms ease,
+    color 120ms ease;
+}
+
+.processing__cancel:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--color-border);
+  background: var(--color-primary);
+  color: var(--hover-contrast-text);
+}
+
+.processing__cancel:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--color-border);
+}

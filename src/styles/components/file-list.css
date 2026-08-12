@@ -1,0 +1,163 @@
+/* Selected file list */
+
+/* --- File List --- */
+.file-list {
+  margin-top: var(--space-xl);
+  border: var(--border);
+  background: var(--color-white);
+}
+
+.file-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-sm) var(--space-lg);
+  border-bottom: 2px solid var(--color-border);
+  background: var(--color-bg-alt);
+}
+
+.file-list__count {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
+}
+
+.file-list__hint {
+  font-family: var(--font-heading);
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.file-list__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 2px solid var(--color-border);
+  font-size: 0.9rem;
+  transition:
+    background 120ms ease,
+    box-shadow 120ms ease;
+  cursor: default;
+}
+
+.file-list__item:hover {
+  background: var(--file-list-item-hover-bg);
+  box-shadow: inset 5px 0 0 var(--file-list-item-hover-accent);
+}
+
+.file-list__item:last-child {
+  border-bottom: none;
+}
+
+.file-list__item[draggable='true'] {
+  cursor: grab;
+}
+
+.file-list__item[draggable='true']:active {
+  cursor: grabbing;
+}
+
+.file-list__item.is-dragging {
+  opacity: 0.4;
+}
+
+.file-list__item.drag-over {
+  background: var(--file-list-drag-over-bg);
+  border-left: 3px solid var(--color-primary);
+}
+
+/* Drag handle icon */
+.file-list__item-drag {
+  color: var(--color-text-muted);
+  opacity: 0.4;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.file-list__item[draggable='true']:hover .file-list__item-drag {
+  opacity: 1;
+}
+
+/* File type badge */
+.file-list__item-badge {
+  font-family: var(--font-heading);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  background: var(--color-bg-alt);
+  border: 2px solid var(--color-border);
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.file-list__item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.file-list__item-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-list__item-size {
+  color: var(--color-text-muted);
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  flex-shrink: 0;
+}
+
+.file-list__item-remove {
+  width: 28px;
+  height: 28px;
+  background: var(--color-bg-alt);
+  border: 2px solid var(--color-border);
+  box-shadow: 2px 2px 0 var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    background 120ms ease,
+    transform 100ms ease,
+    box-shadow 100ms ease,
+    border-color 100ms ease;
+  flex-shrink: 0;
+  color: var(--color-text);
+}
+
+.file-list__item-remove:hover {
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: white;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--color-border);
+}
+
+.file-list__item-remove:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--color-border);
+}
+
+.file-list__item-remove svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.5;
+}

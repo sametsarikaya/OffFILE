@@ -1,0 +1,80 @@
+/* Dark-mode shadow corrections */
+
+/* DARK MODE - BRUTALIST SHADOW FIXES Shadows must be visible on dark backgrounds. Replace near-invisible dark-on-dark shadows with neon-amber brutalist offsets. */
+
+[data-theme='dark'] {
+  --shadow: 4px 4px 0px rgba(255, 191, 60, 0.3);
+  --shadow-hover: 6px 6px 0px rgba(255, 191, 60, 0.65);
+  --shadow-active: 2px 2px 0px rgba(255, 191, 60, 0.2);
+}
+
+/* Tool cards - default shadow + stronger hover */
+[data-theme='dark'] .tool-card {
+  box-shadow: 3px 3px 0px rgba(255, 191, 60, 0.2);
+}
+[data-theme='dark'] .tool-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: 6px 6px 0px rgba(255, 191, 60, 0.7);
+}
+[data-theme='dark'] .tool-card:active {
+  box-shadow: 2px 2px 0px rgba(255, 191, 60, 0.2);
+}
+
+/* Dropzone */
+[data-theme='dark'] .dropzone {
+  box-shadow: 3px 3px 0px rgba(255, 191, 60, 0.12);
+}
+[data-theme='dark'] .dropzone:hover {
+  border-color: var(--color-primary);
+  box-shadow: 5px 5px 0px rgba(255, 191, 60, 0.45);
+}
+
+/* File list */
+[data-theme='dark'] .file-list {
+  box-shadow: 3px 3px 0px rgba(255, 191, 60, 0.12);
+}
+
+/* Options panel */
+[data-theme='dark'] .options-panel {
+  box-shadow: 3px 3px 0px rgba(255, 191, 60, 0.12);
+}
+[data-theme='dark'] .options-panel select:hover,
+[data-theme='dark'] .options-panel input[type='number']:hover,
+[data-theme='dark'] .options-panel input[type='text']:hover {
+  border-color: rgba(255, 191, 60, 0.5);
+}
+
+/* Navbar buttons */
+[data-theme='dark'] .navbar__nav-btn {
+  border-color: #2c2c2c;
+  box-shadow: 3px 3px 0px rgba(255, 191, 60, 0.18);
+}
+[data-theme='dark'] .navbar__nav-btn:hover {
+  box-shadow: 5px 5px 0px rgba(255, 191, 60, 0.55);
+}
+
+/* Download + restart buttons */
+[data-theme='dark'] .download-btn:hover {
+  box-shadow: 6px 6px 0px rgba(0, 217, 138, 0.55);
+}
+[data-theme='dark'] .restart-btn {
+  border-color: #2c2c2c;
+  background: #101010;
+  color: var(--color-text-muted);
+}
+[data-theme='dark'] .restart-btn:hover {
+  border-color: var(--color-primary);
+  box-shadow: 4px 4px 0px rgba(255, 191, 60, 0.45);
+}
+
+/* Processing state */
+[data-theme='dark'] .processing {
+  background: #0a0a0a;
+  border-color: #252525;
+  box-shadow: 4px 4px 0px rgba(255, 191, 60, 0.18);
+}
+
+/* Download area */
+[data-theme='dark'] .download-area__icon {
+  box-shadow: 4px 4px 0px rgba(0, 217, 138, 0.45);
+}

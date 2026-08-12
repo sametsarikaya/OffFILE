@@ -1,0 +1,291 @@
+/* Design tokens and dark-mode palette */
+
+/* OffFILE - Brutalist Design System */
+
+/* --- CSS Custom Properties --- */
+:root {
+  /* Colors */
+  --color-primary: #ffe600;
+  --color-secondary: #f5412a;
+  --color-accent: #04b8ff;
+  --color-cta: #00c67a;
+  --color-bg: #f5f0de;
+  --color-bg-alt: #fff8cc;
+  --color-text: #0a0a0a;
+  --color-text-muted: #262626;
+  --color-border: #0a0a0a;
+  --color-white: #ffffff;
+  --color-grid-line: rgba(10, 10, 10, 0.1);
+
+  /* Brutalist Tokens */
+  --border-width: 3px;
+  --border: var(--border-width) solid var(--color-border);
+  --shadow-offset: 6px;
+  --shadow: var(--shadow-offset) var(--shadow-offset) 0px var(--color-border);
+  --shadow-hover: 8px 8px 0px var(--color-border);
+  --shadow-active: 2px 2px 0px var(--color-border);
+  --radius: 0px;
+
+  /* Typography */
+  --font-heading: 'Oswald', 'Space Grotesk', sans-serif;
+  --font-body: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Layout */
+  --max-width: 1280px;
+  --nav-height: 64px;
+
+  /* Motion */
+  --motion-fast: 110ms;
+  --motion-base: 190ms;
+  --motion-slow: 320ms;
+  --motion-route: 360ms;
+
+  /* Motion colour tokens (shared animations, theme-specific colours) */
+  --hover-contrast-text: #050505;
+  --nav-hover-bg: var(--color-primary);
+  --nav-hover-border: var(--color-border);
+  --nav-hover-shadow: 4px 4px 0 color-mix(in srgb, var(--color-primary) 24%, var(--color-border));
+  --theme-btn-hover-shadow: 5px 5px 0 var(--color-border);
+  --dropzone-stripe-color: color-mix(in srgb, var(--color-border) 11%, transparent);
+  --dropzone-hover-bg: color-mix(in srgb, var(--color-primary) 8%, var(--color-bg-alt));
+  --dropzone-hover-shadow: var(--shadow);
+  --dropzone-active-bg: color-mix(
+    in srgb,
+    var(--dz-color, var(--color-accent)) 8%,
+    var(--color-white)
+  );
+  --dropzone-active-shadow: var(--shadow-hover);
+  --dropzone-page-drag-bg: color-mix(in srgb, var(--color-primary) 6%, var(--color-white));
+  --drag-pulse-from: 0 0 0 0 color-mix(in srgb, var(--color-primary) 26%, transparent);
+  --drag-pulse-to: 0 0 0 14px color-mix(in srgb, var(--color-primary) 0%, transparent);
+  --file-list-drag-over-bg: color-mix(in srgb, var(--color-primary) 10%, var(--color-white));
+  --file-list-item-hover-bg: color-mix(in srgb, var(--color-primary) 8%, var(--color-white));
+  --file-list-item-hover-accent: var(--color-primary);
+  --process-btn-hover-shadow: 8px 8px 0px
+    color-mix(in srgb, var(--color-primary) 30%, var(--color-border));
+  --download-btn-hover-shadow: 8px 8px 0px
+    color-mix(in srgb, var(--color-cta) 35%, var(--color-border));
+  --dropzone-overlay-text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Dark Mode - Neon Brutalist Palette --- */
+[data-theme='dark'] {
+  --color-primary: #ffbf3c;
+  --color-secondary: #ff4d36;
+  --color-cta: #00d98a;
+  --color-bg: #050505;
+  --color-bg-alt: #101010;
+  --color-text: #f8f8f8;
+  --color-text-muted: #b9b9b9;
+  --color-border: #252525;
+  --color-white: #0a0a0a;
+  --color-grid-line: rgba(255, 255, 255, 0.08);
+  --shadow: var(--shadow-offset) var(--shadow-offset) 0px color-mix(in srgb, #616161 22%, #000);
+  --shadow-hover: 8px 8px 0px color-mix(in srgb, #00d7ff 30%, #000);
+  --shadow-active: 2px 2px 0px color-mix(in srgb, #00d7ff 18%, #000);
+
+  /* Dark theme colour layer for shared animations */
+  --hover-contrast-text: #050505;
+  --nav-hover-bg: color-mix(in srgb, var(--color-primary) 90%, #050505);
+  --nav-hover-border: #111;
+  --nav-hover-shadow: 4px 4px 0 color-mix(in srgb, var(--color-primary) 45%, #000);
+  --theme-btn-hover-shadow: 5px 5px 0 color-mix(in srgb, var(--color-primary) 42%, #000);
+  --dropzone-stripe-color: rgba(255, 255, 255, 0.1);
+  --dropzone-hover-bg: color-mix(in srgb, var(--color-primary) 11%, #0e0e0e);
+  --dropzone-hover-shadow: 6px 6px 0 color-mix(in srgb, #00d7ff 28%, #000);
+  --dropzone-active-bg: rgba(30, 30, 30, 0.85);
+  --dropzone-active-shadow: var(--shadow-hover);
+  --dropzone-page-drag-bg: #0f0f0f;
+  --drag-pulse-from: 0 0 0 0 rgba(255, 191, 60, 0.4);
+  --drag-pulse-to: 0 0 0 14px rgba(255, 191, 60, 0);
+  --file-list-drag-over-bg: rgba(255, 191, 60, 0.07);
+  --file-list-item-hover-bg: #181818;
+  --file-list-item-hover-accent: var(--color-primary);
+  --process-btn-hover-shadow: 8px 8px 0px color-mix(in srgb, var(--color-primary) 35%, #000);
+  --download-btn-hover-shadow: 8px 8px 0px color-mix(in srgb, var(--color-cta) 35%, #000);
+  --dropzone-overlay-text-shadow: 0 2px 20px rgba(0, 0, 0, 0.8);
+}
+
+[data-theme='dark'] .navbar {
+  background: #03030a !important;
+  border-bottom-color: #262626 !important;
+}
+
+[data-theme='dark'] .navbar__logo-img {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme='dark'] .navbar__accent {
+  background: var(--color-primary);
+}
+
+[data-theme='dark'] .navbar__nav-btn {
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .navbar__dropdown-menu {
+  background: #0a0a0a;
+  border-color: #262626;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.82),
+    0 0 0 1px rgba(255, 191, 60, 0.1);
+}
+
+[data-theme='dark'] .navbar__privacy {
+  border-color: #262626;
+  background: #090909;
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .navbar__search-input {
+  background: #090909;
+  border-color: #2c2c2c;
+  color: var(--color-text);
+}
+
+[data-theme='dark'] .tool-card {
+  border-color: #2b2b2b;
+  background: #0e0e0e;
+}
+
+[data-theme='dark'] .dropzone {
+  border-color: #2c2c2c;
+  background: #0b0b0b;
+}
+[data-theme='dark'] .file-list {
+  border-color: #2c2c2c;
+  background: #0e0e0e;
+}
+[data-theme='dark'] .file-list__item {
+  border-bottom-color: #2c2c2c;
+}
+[data-theme='dark'] .options-panel {
+  border-color: #2c2c2c;
+  background: #0e0e0e;
+}
+[data-theme='dark'] .hero__title-highlight {
+  background: var(--color-primary);
+  color: #050508;
+  box-shadow: 5px 5px 0 #000;
+}
+[data-theme='dark'] .category-section__title {
+  color: #9a9a9a;
+  border-bottom-color: #2c2c2c;
+}
+[data-theme='dark'] .category-section__line {
+  background: #2c2c2c;
+}
+[data-theme='dark'] .tool-header {
+  border-bottom-color: #2c2c2c;
+}
+[data-theme='dark'] .options-panel select,
+[data-theme='dark'] .options-panel input[type='number'],
+[data-theme='dark'] .options-panel input[type='range'],
+[data-theme='dark'] .options-panel input[type='text'],
+[data-theme='dark'] .options-panel input[type='password'] {
+  background: #050508;
+  border-color: #2c2c2c;
+  color: var(--color-text);
+}
+[data-theme='dark'] .options-panel input[type='text']:focus,
+[data-theme='dark'] .options-panel input[type='password']:focus {
+  border-color: var(--color-primary);
+  box-shadow:
+    4px 4px 0px #000,
+    0 0 0 2px rgba(255, 214, 10, 0.15);
+}
+[data-theme='dark'] .download-area__filename-row {
+  border-color: #2c2c2c;
+  background: #0a0a0a;
+}
+[data-theme='dark'] .download-area__filename-ext {
+  background: #101010;
+  border-left-color: #2c2c2c;
+}
+[data-theme='dark'] .process-btn {
+  background: var(--color-primary);
+  color: #050508;
+  border-color: #000;
+}
+[data-theme='dark'] .download-btn {
+  background: var(--color-cta);
+  color: #050508;
+  border-color: #000;
+}
+[data-theme='dark'] .processing__progress-bar {
+  background: linear-gradient(90deg, #ffbf3c, #ff9f1c, #ff4d36);
+}
+
+/* Dark mode: checkbox */
+[data-theme='dark'] .option-group__checkbox-mark {
+  background: #0a0a0a;
+  border-color: #3a3a3a;
+}
+[data-theme='dark'] .option-group__checkbox:checked + .option-group__checkbox-mark {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+[data-theme='dark'] .option-group__checkbox:checked + .option-group__checkbox-mark::after {
+  border-color: #050508;
+}
+[data-theme='dark'] .option-group__checkbox-text {
+  color: var(--color-text);
+}
+
+/* Dark mode: option-group label */
+[data-theme='dark'] .option-group__label {
+  color: var(--color-text);
+}
+
+/* Dark mode: select focus */
+[data-theme='dark'] .options-panel select:focus {
+  border-color: var(--color-primary);
+  box-shadow:
+    4px 4px 0 #000,
+    0 0 0 2px rgba(255, 214, 10, 0.15);
+  outline: none;
+}
+
+/* Dark mode: number input focus */
+[data-theme='dark'] .options-panel input[type='number']:focus {
+  border-color: var(--color-primary);
+  box-shadow:
+    4px 4px 0 #000,
+    0 0 0 2px rgba(255, 214, 10, 0.15);
+  outline: none;
+}
+
+/* Dark mode: options panel title */
+[data-theme='dark'] .options-panel__title {
+  color: var(--color-text);
+  border-bottom-color: #2c2c2c;
+}
+
+/* Dark mode: download-area filename input */
+[data-theme='dark'] .download-area__filename-input {
+  background: #050508;
+  border-color: #2c2c2c;
+  color: var(--color-text);
+}
+[data-theme='dark'] .download-area__filename-input:focus {
+  border-color: var(--color-primary);
+  box-shadow:
+    4px 4px 0 #000,
+    0 0 0 2px rgba(255, 214, 10, 0.15);
+}
+
+/* Dark mode: value badge for range inputs */
+[data-theme='dark'] .option-group__value {
+  background: var(--color-primary);
+  color: #050508;
+}

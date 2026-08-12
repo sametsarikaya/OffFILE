@@ -1,0 +1,50 @@
+/* Global shadow transitions */
+
+/* BOX-SHADOW TRANSITIONS - GLOBAL */
+
+/* Ensure all interactive elements animate shadow changes */
+.options-panel select,
+.options-panel input[type='number'],
+.options-panel input[type='range'],
+.options-panel input[type='text'],
+.options-panel input[type='password'] {
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+}
+
+.file-list__item {
+  transition:
+    background var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+}
+
+.download-btn {
+  transition:
+    transform var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+}
+
+[data-theme='dark'] .download-btn {
+  transition:
+    transform var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+}
+
+/* Dark mode: file list */
+[data-theme='dark'] .file-list {
+  transition: box-shadow var(--motion-base) ease;
+}
+[data-theme='dark'] .file-list:hover {
+  box-shadow: 4px 4px 0 rgba(255, 191, 60, 0.22);
+}
+
+/* Dark mode: options panel */
+[data-theme='dark'] .options-panel {
+  transition: box-shadow var(--motion-base) ease;
+}
+[data-theme='dark'] .options-panel:hover {
+  box-shadow: 4px 4px 0 rgba(255, 191, 60, 0.18);
+}

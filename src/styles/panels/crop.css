@@ -1,0 +1,57 @@
+/* Crop panel */
+
+/* CROP INTERACTIVE PANEL */
+
+.crop-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  background: var(--color-white);
+  padding: var(--space-lg);
+}
+
+[data-theme='dark'] .crop-panel {
+  background: #0e0e0e;
+  border-color: #2c2c2c;
+  box-shadow: 4px 4px 0px rgba(255, 191, 60, 0.18);
+}
+
+.crop-preview-wrap {
+  width: 100%;
+  overflow: hidden;
+  background: repeating-conic-gradient(#aaa 0% 25%, transparent 0% 50%) 0 0 / 16px 16px;
+}
+
+.crop-canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.crop-sliders {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+@media (max-width: 600px) {
+  .crop-sliders {
+    grid-template-columns: 1fr;
+  }
+}
+
+.crop-slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.crop-slider-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

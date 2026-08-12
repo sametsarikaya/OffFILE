@@ -1,0 +1,183 @@
+/* Keyboard shortcuts modal */
+
+/* --- Keyboard Shortcuts Modal --- */
+.shortcuts-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 9100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.shortcuts-modal-overlay.is-visible {
+  opacity: 1;
+}
+
+.shortcuts-modal {
+  background: var(--color-white);
+  border: var(--border);
+  box-shadow: var(--shadow-hover);
+  max-width: 480px;
+  width: 100%;
+  transform: translateY(12px);
+  transition: transform 180ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+.shortcuts-modal-overlay.is-visible .shortcuts-modal {
+  transform: translateY(0);
+}
+
+.shortcuts-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg) var(--space-xl);
+  border-bottom: 2px solid var(--color-border);
+  background: var(--color-bg-alt);
+}
+
+.shortcuts-modal__title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.shortcuts-modal__close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  box-shadow: 2px 2px 0 var(--color-border);
+  cursor: pointer;
+  color: var(--color-text);
+  transition:
+    background var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    border-color var(--motion-fast) ease;
+}
+
+.shortcuts-modal__close svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+}
+
+.shortcuts-modal__close:hover {
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: #fff;
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--color-border);
+}
+
+.shortcuts-modal__close:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--color-border);
+}
+
+.shortcuts-modal__table {
+  width: 100%;
+  border-collapse: collapse;
+  padding: var(--space-md) 0;
+}
+
+.shortcuts-modal__table tr {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.shortcuts-modal__table tr:last-child {
+  border-bottom: none;
+}
+
+.shortcuts-modal__table td {
+  padding: var(--space-md) var(--space-xl);
+  vertical-align: middle;
+}
+
+.shortcuts-modal__table td:first-child {
+  width: 1%;
+  white-space: nowrap;
+}
+
+.shortcuts-modal__key {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  background: var(--color-bg-alt);
+  border: 2px solid var(--color-border);
+  box-shadow: 2px 2px 0 var(--color-border);
+  white-space: nowrap;
+}
+
+.shortcuts-modal__desc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  padding-left: var(--space-lg);
+}
+
+.shortcuts-modal__hint {
+  padding: var(--space-md) var(--space-xl);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  border-top: 2px solid var(--color-border);
+  background: var(--color-bg-alt);
+  font-family: var(--font-mono);
+}
+
+/* Dark mode - shortcuts modal */
+[data-theme='dark'] .shortcuts-modal {
+  background: #0e0e0e;
+  border-color: #2c2c2c;
+}
+
+[data-theme='dark'] .shortcuts-modal__header,
+[data-theme='dark'] .shortcuts-modal__hint {
+  background: #111;
+  border-color: #2c2c2c;
+}
+
+[data-theme='dark'] .shortcuts-modal__table tr {
+  border-bottom-color: #2c2c2c;
+}
+
+[data-theme='dark'] .shortcuts-modal__key {
+  background: #0a0a0a;
+  border-color: #3a3a3a;
+  box-shadow: 2px 2px 0 #000;
+  color: var(--color-text);
+}
+
+/* Responsive: shortcuts modal */
+@media (max-width: 860px) {
+  .process-btn-row {
+    flex-direction: column;
+  }
+
+  .shortcuts-modal__table td {
+    padding: var(--space-sm) var(--space-md);
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .shortcuts-modal-overlay,
+  .shortcuts-modal {
+    transition: none !important;
+  }
+}

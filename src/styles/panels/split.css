@@ -1,0 +1,85 @@
+/* Crop aspect lock and split selection */
+
+/* IMAGE CROP - ASPECT RATIO LOCK */
+
+.crop-lock-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) 0;
+}
+
+.crop-lock-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  user-select: none;
+}
+
+.crop-lock-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* PDF SPLIT - THUMBNAIL SELECTION */
+
+.split-item {
+  cursor: pointer;
+  position: relative;
+}
+
+.split-item--selected {
+  border-color: var(--color-cta) !important;
+  box-shadow: 4px 4px 0px var(--color-cta) !important;
+}
+
+[data-theme='dark'] .split-item--selected {
+  border-color: var(--color-cta) !important;
+  box-shadow: 4px 4px 0px rgba(0, 217, 138, 0.55) !important;
+}
+
+.split-item__check {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  background: var(--color-cta);
+  border: 2px solid #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--motion-fast) ease;
+  pointer-events: none;
+  color: #fff;
+}
+
+.split-item--selected .split-item__check {
+  opacity: 1;
+}
+
+.split-mode-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.split-mode-row .option-group__select {
+  width: auto;
+  min-width: 220px;
+}
+
+.split-actions {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}

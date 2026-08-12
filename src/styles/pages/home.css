@@ -1,0 +1,225 @@
+/* Home: hero, search, tool grid and cards */
+
+/* --- Main Content --- */
+.main-content {
+  padding-top: calc(var(--nav-height) + var(--space-2xl));
+  padding-bottom: var(--space-3xl);
+  min-height: 100vh;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+/* --- Hero Section --- */
+.hero {
+  text-align: center;
+  margin-bottom: var(--space-3xl);
+  position: relative;
+  animation: heroRise 560ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+
+.hero__title {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: var(--space-md);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-wrap: balance;
+}
+
+.hero__title-highlight {
+  background: var(--color-primary);
+  color: var(--color-text);
+  padding: 2px var(--space-sm);
+  display: inline-block;
+  transform: rotate(-1.2deg);
+  border: 2px solid var(--color-border);
+  box-shadow: 5px 5px 0 var(--color-border);
+}
+
+.hero__subtitle {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--color-text-muted);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+@keyframes heroRise {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Tool Search --- */
+.tool-search {
+  margin-bottom: var(--space-2xl);
+}
+
+.tool-search__input {
+  width: 100%;
+  padding: 14px 20px;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  outline: none;
+  transition:
+    box-shadow var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.tool-search__input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.6;
+}
+
+.tool-search__input:focus {
+  box-shadow: var(--shadow-hover);
+  transform: translate(-2px, -2px);
+}
+
+.tool-search__input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+/* --- Tool Grid --- */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-3xl);
+}
+
+/* --- Tool Card --- */
+.tool-card {
+  background: var(--color-white);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  padding: var(--space-xl);
+  cursor: pointer;
+  transition:
+    transform var(--motion-base) cubic-bezier(0.19, 0.9, 0.31, 1),
+    box-shadow var(--motion-base) cubic-bezier(0.19, 0.9, 0.31, 1),
+    background var(--motion-base) ease;
+  position: relative;
+  overflow: hidden;
+  /* staggered entrance */
+  opacity: 0;
+  transform: translateY(24px) rotate(var(--card-tilt, 0deg));
+  animation: cardEntrance 0.45s cubic-bezier(0.2, 0, 0.1, 1.3) forwards;
+  animation-delay: calc(var(--card-stagger, 0) * 45ms);
+}
+
+/* Top accent bar */
+.tool-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: var(--card-color, var(--color-secondary));
+  transition: height 150ms ease;
+}
+
+.tool-card:hover {
+  transform: translate(-4px, -4px) rotate(0deg) scale(1.01);
+  box-shadow: 8px 8px 0px
+    color-mix(in srgb, var(--card-color, var(--color-border)) 65%, var(--color-border));
+}
+.tool-card:hover::before {
+  height: 8px;
+}
+
+[data-theme='dark'] .tool-card:hover {
+  box-shadow: 8px 8px 0px color-mix(in srgb, var(--card-color) 55%, #000);
+}
+
+.tool-card:active {
+  transform: translate(2px, 2px) rotate(0deg) scale(0.995);
+  box-shadow: var(--shadow-active);
+}
+.tool-card:active::before {
+  height: 6px;
+}
+
+.tool-card__icon {
+  width: 56px;
+  height: 56px;
+  background: var(--card-color, var(--color-secondary));
+  border: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+}
+
+.tool-card__icon svg {
+  width: 28px;
+  height: 28px;
+  stroke: var(--color-white);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.tool-card__title {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.tool-card__desc {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+@keyframes cardEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97) rotate(calc(var(--card-tilt, 0deg) * 1.5));
+  }
+  68% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1.01) rotate(calc(var(--card-tilt, 0deg) * 0.7));
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(var(--card-tilt, 0deg));
+  }
+}
+
+/* --- Category Sections --- */
+.category-section {
+  margin-bottom: var(--space-2xl);
+}
+
+.category-section__title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-lg);
+  padding-bottom: var(--space-sm);
+  border-bottom: 2px solid var(--color-border);
+}

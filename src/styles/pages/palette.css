@@ -1,0 +1,119 @@
+/* Colour palette result */
+
+/* COLOR PALETTE RESULT */
+
+.palette-result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  animation: pageEntrance 0.3s ease forwards;
+}
+
+.palette-result__header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.palette-result__title {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.palette-result__source {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  word-break: break-all;
+}
+
+.palette-result__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-md);
+}
+
+.palette-swatch {
+  display: flex;
+  flex-direction: column;
+  border: var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  overflow: hidden;
+  transition:
+    transform var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+}
+
+.palette-swatch:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: var(--shadow-hover);
+}
+
+.palette-swatch:active {
+  transform: translate(1px, 1px);
+  box-shadow: var(--shadow-active);
+}
+
+.palette-swatch__color {
+  height: 96px;
+  width: 100%;
+}
+
+.palette-swatch__info {
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.palette-swatch__hex {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.palette-swatch__rgb {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+.palette-result__actions {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+}
+
+/* Restart / secondary action button */
+.restart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: var(--border);
+  box-shadow: var(--shadow);
+  background: var(--color-bg-alt);
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    transform var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
+}
+
+.restart-btn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-hover);
+}
