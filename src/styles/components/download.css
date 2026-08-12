@@ -101,7 +101,8 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   background: var(--color-cta);
-  color: var(--color-white);
+  /* Dark ink on the green: white gave 2.24:1. */
+  color: var(--color-text);
   border: var(--border);
   box-shadow: var(--shadow);
   padding: var(--space-lg) var(--space-2xl);

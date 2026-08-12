@@ -1,6 +1,7 @@
 import { renderHome } from './pages/home';
 import { renderToolPage } from './pages/toolPage';
 import { releaseActiveSession } from './pages/toolSession';
+import { focusHeading } from './utils/a11y';
 
 const app = document.getElementById('app')!;
 
@@ -45,9 +46,13 @@ function handleRoute(): void {
 function renderRoute(hash: string): void {
   if (hash.startsWith(TOOL_ROUTE_PREFIX)) {
     renderToolPage(app, hash.slice(TOOL_ROUTE_PREFIX.length));
-    return;
+  } else {
+    renderHome(app);
   }
-  renderHome(app);
+
+  // Only on a navigation. Focusing a heading on first paint would jump the
+  // skip link, which must be the first thing Tab reaches.
+  if (hasRenderedRoute) focusHeading(app);
 }
 
 function prefersReducedMotion(): boolean {

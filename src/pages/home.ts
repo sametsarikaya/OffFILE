@@ -11,6 +11,7 @@ import { getFavoriteIds, isFavorite } from '../utils/favorites';
 import { getRecentToolIds } from '../utils/recentTools';
 import { getHomeSearchQuery, buildHomeHash } from '../utils/hash';
 import { isInputFocused, onRouteKeyDown, clearElement } from '../utils/dom';
+import { announce } from '../utils/a11y';
 import type { Tool } from '../types';
 
 const STAR_ICON = `<svg viewBox="0 0 24 24" width="14" height="14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -38,6 +39,8 @@ export function renderHome(app: HTMLElement): void {
 
   const main = document.createElement('main');
   main.className = 'main-content';
+  main.id = 'main-content';
+  main.tabIndex = -1;
 
   const container = document.createElement('div');
   container.className = 'container';
@@ -230,6 +233,9 @@ function createSearchHandler(ctx: SearchContext): (query: string) => void {
     if (matched.length > 0) resultSection.appendChild(createToolGrid(matched));
 
     ctx.container.insertBefore(resultSection, ctx.footer);
+    announce(
+      matched.length > 0 ? `${matched.length} tools match ${query}` : `No tools match ${query}`
+    );
   };
 }
 

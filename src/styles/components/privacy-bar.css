@@ -53,7 +53,8 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--color-text);
-  opacity: 0.55;
+  /* 0.55 landed at 3.86:1 on the yellow band. */
+  opacity: 0.78;
 }
 
 .privacy-bar__heading {
@@ -223,7 +224,8 @@
 }
 
 [data-theme='dark'] .privacy-bar__pillar-desc {
-  color: #666666;
+  /* #666 on #111 is 3.28:1; small body text needs 4.5:1. */
+  color: #9a9a9a;
 }
 
 [data-theme='dark'] .privacy-bar__bottom {

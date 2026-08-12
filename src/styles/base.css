@@ -98,3 +98,51 @@ button {
   background: none;
   font-size: inherit;
 }
+
+/* --- Accessibility utilities --- */
+
+/* Available to screen readers, absent from the visual layout. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip link: hidden until focused, then pinned to the top-left. */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: var(--space-md);
+  z-index: 1000;
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-primary);
+  color: var(--color-text);
+  border: var(--border);
+  box-shadow: var(--shadow);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: top var(--motion-fast) ease;
+}
+
+.skip-link:focus {
+  top: var(--space-md);
+}
+
+/* A heading focused after a route change must not look like a control. */
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+/* Everything else keeps a visible focus ring. */
+:focus-visible {
+  outline: 3px solid var(--color-text);
+  outline-offset: 2px;
+}

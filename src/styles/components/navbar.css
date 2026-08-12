@@ -466,7 +466,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-cta);
+  color: var(--color-cta-ink);
   background: var(--color-bg-alt);
   border: 2px solid var(--color-border);
   box-shadow: 3px 3px 0 var(--color-border);

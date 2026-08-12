@@ -11,6 +11,7 @@ import { escapeHtml } from '../utils/escapeHtml';
 import { isFavorite, toggleFavorite } from '../utils/favorites';
 import { buildHomeHash } from '../utils/hash';
 import { isInputFocused, onRouteKeyDown, clearElement } from '../utils/dom';
+import { announce } from '../utils/a11y';
 import { createSession, defaultOptions, releaseDownload, setActiveSession } from './toolSession';
 import type { ToolSession } from './toolSession';
 import { runSingle, runBatch, processButtonLabel } from './toolRun';
@@ -47,6 +48,8 @@ export function renderToolPage(app: HTMLElement, toolId: string): void {
 
   const main = document.createElement('main');
   main.className = 'main-content';
+  main.id = 'main-content';
+  main.tabIndex = -1;
 
   const container = document.createElement('div');
   container.className = 'container';
@@ -66,7 +69,6 @@ export function renderToolPage(app: HTMLElement, toolId: string): void {
   container.appendChild(page);
   main.appendChild(container);
   app.appendChild(main);
-
   onRouteKeyDown((e) => handleShortcut(e, session));
   renderDropState(session);
 }
@@ -183,6 +185,8 @@ export function renderDropState(session: ToolSession): void {
 
 export function renderFilesSelected(session: ToolSession): void {
   const { workArea } = session;
+  const count = session.files.length;
+  announce(`${count} file${count === 1 ? '' : 's'} selected. Ready to process.`);
   clearElement(workArea);
   appendAddMoreZone(session);
   workArea.appendChild(buildFileList(session));

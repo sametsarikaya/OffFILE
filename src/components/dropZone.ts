@@ -46,9 +46,11 @@ export function createDropZone(config: DropZoneConfig): HTMLElement {
   zone.className = 'dropzone';
   zone.id = 'drop-zone';
   zone.style.setProperty('--dz-color', color);
-  zone.setAttribute('tabindex', '0');
-  zone.setAttribute('role', 'button');
-  zone.setAttribute('aria-label', 'Upload file - drag and drop or click to browse');
+  // A region, not a control: it used to carry role="button" and tabindex while
+  // containing a real button and a file input, which nests one control inside
+  // another. Keyboard users reach the "Choose Files" button directly.
+  zone.setAttribute('role', 'group');
+  zone.setAttribute('aria-label', 'Upload files - drag and drop, or use the button');
 
   const accepts = acceptedTypes
     .split(',')
@@ -101,11 +103,12 @@ export function createDropZone(config: DropZoneConfig): HTMLElement {
   }
 
   browseBtn.addEventListener('click', () => input.click());
-  zone.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      input.click();
-    }
+
+  // Clicking anywhere in the zone still opens the picker, but the zone is no
+  // longer a keyboard target of its own - the button inside it is.
+  zone.addEventListener('click', (e) => {
+    if (e.target === browseBtn || browseBtn.contains(e.target as Node)) return;
+    input.click();
   });
 
   // Mobile touch: tap on the zone itself opens the file picker

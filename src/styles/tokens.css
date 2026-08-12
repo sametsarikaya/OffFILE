@@ -9,6 +9,9 @@
   --color-secondary: #f5412a;
   --color-accent: #04b8ff;
   --color-cta: #00c67a;
+  /* The CTA green is a surface colour: at 4.5:1 it needs dark text on it, and
+     as text it needs a darker shade to stay readable on the cream background. */
+  --color-cta-ink: #05663f;
   --color-bg: #f5f0de;
   --color-bg-alt: #fff8cc;
   --color-text: #0a0a0a;
@@ -83,6 +86,7 @@
   --color-primary: #ffbf3c;
   --color-secondary: #ff4d36;
   --color-cta: #00d98a;
+  --color-cta-ink: #4fe8ae;
   --color-bg: #050505;
   --color-bg-alt: #101010;
   --color-text: #f8f8f8;

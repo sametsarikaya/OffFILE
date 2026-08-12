@@ -1,13 +1,16 @@
+import { trapFocus } from '../utils/a11y';
+
 const SHORTCUTS: { key: string; desc: string }[] = [
   { key: '?', desc: 'Open/close the shortcuts panel' },
   { key: 'Esc', desc: 'Go home / close the modal' },
   { key: 'Enter', desc: 'Start processing (when a file is selected)' },
+  { key: 'Ctrl/Cmd + Z', desc: 'Start over on a tool page' },
   { key: 'Drag & Drop', desc: 'Drop a file anywhere on the page' },
   { key: 'Tab', desc: 'Navigate between controls' },
-  { key: 'Space', desc: 'Run the focused tool card' },
 ];
 
 let modalEl: HTMLElement | null = null;
+let releaseFocus: (() => void) | null = null;
 
 export function showShortcutsModal(): void {
   if (modalEl) return;
@@ -55,11 +58,19 @@ export function showShortcutsModal(): void {
   document.body.appendChild(overlay);
   modalEl = overlay;
 
+  // Without this, Tab walks the page behind the dialog and focus never returns
+  // to whatever opened it.
+  releaseFocus = trapFocus(overlay);
+
   requestAnimationFrame(() => overlay.classList.add('is-visible'));
 }
 
 export function hideShortcutsModal(): void {
   if (!modalEl) return;
+
+  releaseFocus?.();
+  releaseFocus = null;
+
   modalEl.classList.remove('is-visible');
   modalEl.addEventListener(
     'transitionend',

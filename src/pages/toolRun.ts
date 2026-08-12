@@ -3,6 +3,7 @@ import { showProcessing, showDownload, showError } from '../components/processin
 import { runTool, runToolBatch, cancelCurrentTool } from '../worker/workerClient';
 import { recordRecentTool } from '../utils/recentTools';
 import { delay } from '../utils/dom';
+import { announce, focusHeading } from '../utils/a11y';
 import type { Tool } from '../types';
 import type { ToolSession } from './toolSession';
 import { renderDropState, renderFilesSelected } from './toolPage';
@@ -25,6 +26,8 @@ export async function runSingle(session: ToolSession): Promise<void> {
     renderDropState(session);
   });
 
+  announce(`Processing ${files.length} file${files.length === 1 ? '' : 's'} with ${tool.title}.`);
+
   try {
     await delay(PROGRESS_SETTLE_MS);
     const result = await runTool(tool.id, files, options, updateProgress);
@@ -46,6 +49,8 @@ export async function runSingle(session: ToolSession): Promise<void> {
     });
 
     recordRecentTool(tool.id);
+    announce(`Done. ${result.filename} is ready to download.`);
+    focusHeading(workArea);
     session.downloadCleanup = () => {
       cleanup();
       result.release?.();
@@ -93,6 +98,8 @@ export async function runBatch(session: ToolSession): Promise<void> {
     });
 
     recordRecentTool(tool.id);
+    announce(`Done. ${results.length} files packaged and ready to download.`);
+    focusHeading(workArea);
     session.downloadCleanup = () => {
       cleanup();
       for (const item of results) item.release?.();
@@ -114,10 +121,12 @@ function reportFailure(session: ToolSession, err: unknown, fallback?: string): v
 
   const message = err instanceof Error ? err.message : (fallback ?? 'An unknown error occurred.');
 
+  announce(`Something went wrong. ${message}`, 'assertive');
   showError(session.workArea, message, {
     onRetry: () => reRender(session),
     onRestart: () => renderDropState(session),
   });
+  focusHeading(session.workArea);
 }
 
 function totalBytes(files: readonly File[]): number {

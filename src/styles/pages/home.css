@@ -186,6 +186,32 @@
   letter-spacing: 0.02em;
 }
 
+/* The title link covers the card, so the whole surface stays clickable while
+   the accessible name and keyboard target remain a single ordinary link. The
+   star button sits above it on its own z-index. */
+.tool-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.tool-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.tool-card:focus-within {
+  transform: translate(-4px, -4px) rotate(0deg);
+  box-shadow: 8px 8px 0px
+    color-mix(in srgb, var(--card-color, var(--color-border)) 65%, var(--color-border));
+}
+
+.tool-card__link:focus-visible {
+  outline: 3px solid var(--color-text);
+  outline-offset: 3px;
+}
+
 .tool-card__desc {
   font-size: 0.9rem;
   color: var(--color-text-muted);
