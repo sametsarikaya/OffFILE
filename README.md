@@ -1,7 +1,7 @@
 # OffFile
 
 [![AGPLv3 License](https://img.shields.io/badge/license-AGPLv3-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.10.1-lightgrey.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-0.11.0-lightgrey.svg)](package.json)
 [![Site](https://img.shields.io/badge/site-offfile.sametsarikaya.com-red.svg)](https://offfile.sametsarikaya.com)
 
 38 file tools that run entirely in your browser. No uploads, no accounts, no server.
