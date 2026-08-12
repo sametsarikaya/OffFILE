@@ -10,7 +10,25 @@ interface PendingRequest {
   onProgress: ProgressCallback;
 }
 
-const POOL_SIZE = 2;
+/**
+ * Batch jobs are spread across this many workers.
+ *
+ * Each one can hold a whole PDF or decoded bitmap in memory, so this trades
+ * throughput against peak memory rather than chasing core count: one core is
+ * left for the UI thread, and the ceiling keeps a 16-core desktop from opening
+ * sixteen copies of pdf.js. A machine that does not report its core count gets
+ * the old fixed pair.
+ */
+const MAX_POOL_SIZE = 4;
+const FALLBACK_POOL_SIZE = 2;
+
+const POOL_SIZE = computePoolSize();
+
+function computePoolSize(): number {
+  const cores = navigator.hardwareConcurrency;
+  if (!cores || !Number.isFinite(cores)) return FALLBACK_POOL_SIZE;
+  return Math.max(1, Math.min(cores - 1, MAX_POOL_SIZE));
+}
 
 const pool: Worker[] = [];
 const pendingByWorker = new Map<Worker, Map<string, PendingRequest>>();

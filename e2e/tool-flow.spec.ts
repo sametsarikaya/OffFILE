@@ -81,6 +81,32 @@ test.describe('end-to-end tool run', () => {
     await expect(page.locator('#drop-zone')).toBeVisible();
   });
 
+  test('runs a batch across the worker pool and returns a ZIP', async ({ page }) => {
+    // image-grayscale takes one file at a time, so several files put the page
+    // into batch mode and spread the work over the pool.
+    await page.goto('/#/tool/image-grayscale');
+    // The first drop zone is single-file; the "Add Files for Batch" zone that
+    // appears afterwards accepts the rest.
+    await selectFiles(page, [pngFile('one.png')]);
+    await page
+      .locator('#dz-file-input')
+      .first()
+      .setInputFiles([
+        pngFile('two.png'),
+        pngFile('three.png'),
+        pngFile('four.png'),
+        pngFile('five.png'),
+      ]);
+
+    await expect(page.locator('#file-list')).toContainText('5 file(s) selected');
+    await page.locator('#process-btn').click();
+
+    await expect(page.locator('#download-btn')).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator('#download-btn')).toHaveAttribute('download', /\.zip$/i);
+    await expect(page.locator('#download-list')).toContainText('one_gray');
+    await expect(page.locator('#download-list')).toContainText('five_gray');
+  });
+
   test('generates a QR code without any file input', async ({ page }) => {
     await page.goto('/#/tool/qr-code');
     await expect(page.locator('#drop-zone')).toHaveCount(0);

@@ -137,6 +137,16 @@ function handleShortcut(e: KeyboardEvent, session: ToolSession): void {
   }
 }
 
+/**
+ * Whether a single-file tool can also process several files in one go.
+ *
+ * Tools with an interactive panel are excluded: a crop box or page order drawn
+ * from the first file means nothing for the rest.
+ */
+function supportsBatch(tool: ToolSession['tool']): boolean {
+  return !tool.multiple && !tool.skipDropZone && !tool.renderInteractivePanel;
+}
+
 /** Empty state: the drop zone, or straight to the button for input-less tools. */
 export function renderDropState(session: ToolSession): void {
   const { tool, workArea } = session;
@@ -151,14 +161,20 @@ export function renderDropState(session: ToolSession): void {
     return;
   }
 
+  const acceptsMany = tool.multiple || supportsBatch(tool);
+
   workArea.appendChild(
     createDropZone({
       acceptedTypes: tool.acceptedTypes,
-      multiple: tool.multiple,
+      multiple: acceptsMany,
       color: tool.color,
       maxWarnBytes: tool.maxWarnBytes,
       onFiles: (files) => {
-        session.files = tool.multiple ? [...session.files, ...files] : [files[0]];
+        session.files = tool.multiple
+          ? [...session.files, ...files]
+          : acceptsMany
+            ? [...files]
+            : [files[0]];
         renderFilesSelected(session);
       },
     })
@@ -175,8 +191,9 @@ export function renderFilesSelected(session: ToolSession): void {
 
 function appendAddMoreZone(session: ToolSession): void {
   const { tool, workArea } = session;
-  const isBatch = !tool.multiple && session.files.length > 1;
-  if (!tool.multiple && !isBatch) return;
+  if (!tool.multiple && !supportsBatch(tool)) return;
+
+  const isBatch = !tool.multiple;
 
   const zone = createDropZone({
     acceptedTypes: tool.acceptedTypes,
