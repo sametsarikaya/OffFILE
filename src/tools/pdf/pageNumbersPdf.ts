@@ -1,4 +1,3 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import type { Tool } from '../../types';
 
 const pageNumbersPdf: Tool = {
@@ -41,53 +40,6 @@ const pageNumbersPdf: Tool = {
       defaultValue: 'number',
     },
   ],
-
-  async process(files, options, onProgress) {
-    const file = files[0];
-    const position = (options.position as string) || 'center';
-    const format = (options.format as string) || 'number';
-    onProgress(20);
-
-    const arrayBuffer = await file.arrayBuffer();
-    const pdfDoc = await PDFDocument.load(arrayBuffer);
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    onProgress(40);
-
-    const pages = pdfDoc.getPages();
-    const total = pages.length;
-    const fontSize = 10;
-    const margin = 30;
-
-    for (let i = 0; i < total; i++) {
-      const page = pages[i];
-      const { width } = page.getSize();
-
-      const label =
-        format === 'of' ? `${i + 1} of ${total}` : format === 'dash' ? `- ${i + 1} -` : `${i + 1}`;
-
-      const textWidth = font.widthOfTextAtSize(label, fontSize);
-      let x = margin;
-      if (position === 'center') x = (width - textWidth) / 2;
-      else if (position === 'right') x = width - textWidth - margin;
-
-      page.drawText(label, {
-        x,
-        y: margin - 10,
-        size: fontSize,
-        font,
-        color: rgb(0.4, 0.4, 0.4),
-      });
-
-      onProgress(40 + (i / total) * 50);
-    }
-
-    const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
-    onProgress(100);
-
-    const baseName = file.name.replace(/\.pdf$/i, '');
-    return { blob, filename: `${baseName}_numbered.pdf` };
-  },
 };
 
 export default pageNumbersPdf;

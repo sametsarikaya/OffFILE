@@ -1,4 +1,3 @@
-import { PDFDocument } from 'pdf-lib';
 import type { Tool } from '../../types';
 
 const extractPagesPdf: Tool = {
@@ -34,35 +33,6 @@ const extractPagesPdf: Tool = {
       defaultValue: 3,
     },
   ],
-
-  async process(files, options, onProgress) {
-    const file = files[0];
-    const from = Math.max(1, Number(options.from) || 1);
-    let to = Number(options.to) || 3;
-    onProgress(20);
-
-    const arrayBuffer = await file.arrayBuffer();
-    const srcDoc = await PDFDocument.load(arrayBuffer);
-    const total = srcDoc.getPageCount();
-    to = Math.min(to, total);
-
-    if (from > total) throw new Error(`Start page ${from} exceeds total pages (${total}).`);
-    if (from > to) throw new Error(`"From" page must be ≤ "To" page.`);
-
-    onProgress(40);
-    const newDoc = await PDFDocument.create();
-    const indices = Array.from({ length: to - from + 1 }, (_, i) => from - 1 + i);
-    const copied = await newDoc.copyPages(srcDoc, indices);
-    copied.forEach((p) => newDoc.addPage(p));
-    onProgress(80);
-
-    const pdfBytes = await newDoc.save();
-    const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
-    onProgress(100);
-
-    const baseName = file.name.replace(/\.pdf$/i, '');
-    return { blob, filename: `${baseName}_pages${from}-${to}.pdf` };
-  },
 };
 
 export default extractPagesPdf;

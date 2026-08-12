@@ -1,4 +1,3 @@
-import { PDFDocument, degrees } from 'pdf-lib';
 import type { Tool } from '../../types';
 
 const rotatePdf: Tool = {
@@ -29,30 +28,6 @@ const rotatePdf: Tool = {
       defaultValue: '90',
     },
   ],
-
-  async process(files, options, onProgress) {
-    const file = files[0];
-    const angle = parseInt(options.angle as string) || 90;
-    onProgress(20);
-
-    const arrayBuffer = await file.arrayBuffer();
-    const pdfDoc = await PDFDocument.load(arrayBuffer);
-    onProgress(40);
-
-    const pages = pdfDoc.getPages();
-    for (let i = 0; i < pages.length; i++) {
-      const currentRotation = pages[i].getRotation().angle;
-      pages[i].setRotation(degrees(currentRotation + angle));
-      onProgress(40 + (i / pages.length) * 40);
-    }
-
-    const pdfBytes = await pdfDoc.save();
-    const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
-    onProgress(100);
-
-    const baseName = file.name.replace(/\.pdf$/i, '');
-    return { blob, filename: `${baseName}_rotated.pdf` };
-  },
 };
 
 export default rotatePdf;
