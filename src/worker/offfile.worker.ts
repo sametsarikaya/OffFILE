@@ -1,4 +1,5 @@
 import type { WorkerRequest, WorkerResponse } from '../types';
+import { writeResult, resultName } from './opfs';
 
 /* ---- Tool routing sets ---- */
 
@@ -51,34 +52,38 @@ const CONVERT_TOOLS = new Set([
 
 /* ---- Message handler ---- */
 
-self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
-  const { id, toolId, buffers, fileNames, fileMimes, options } = e.data;
+const post = (message: WorkerResponse, transfer?: Transferable[]) =>
+  (self as unknown as Worker).postMessage(message, transfer ?? []);
 
-  const progress = (percent: number) =>
-    (self as unknown as Worker).postMessage({
-      type: 'progress',
-      id,
-      percent,
-    } satisfies WorkerResponse);
+self.onmessage = async (e: MessageEvent<WorkerRequest>) => {
+  const { id, toolId, files, options } = e.data;
+
+  const progress = (percent: number) => post({ type: 'progress', id, percent });
 
   try {
+    // Reading here rather than on the main thread keeps the bytes in one place.
+    const buffers = await Promise.all(files.map((file) => file.arrayBuffer()));
+    const fileNames = files.map((file) => file.name);
+    const fileMimes = files.map((file) => file.type);
+
     const result = await dispatch(toolId, buffers, fileNames, fileMimes, options, progress);
-    (self as unknown as Worker).postMessage(
-      {
-        type: 'result',
-        id,
-        buffer: result.buffer,
-        filename: result.filename,
-        mime: result.mime,
-      } satisfies WorkerResponse,
+
+    const name = await writeResult(resultName(id, result.filename), result.buffer);
+    if (name) {
+      post({ type: 'result-file', id, name, filename: result.filename, mime: result.mime });
+      return;
+    }
+
+    post(
+      { type: 'result', id, buffer: result.buffer, filename: result.filename, mime: result.mime },
       [result.buffer]
     );
   } catch (err) {
-    (self as unknown as Worker).postMessage({
+    post({
       type: 'error',
       id,
       message: err instanceof Error ? err.message : 'Processing failed.',
-    } satisfies WorkerResponse);
+    });
   }
 };
 

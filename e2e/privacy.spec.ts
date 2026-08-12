@@ -1,5 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
-import { pngFile } from './fixtures';
+import { pngFile, pdfFile } from './fixtures';
+import { PDFDocument } from 'pdf-lib';
+import { readFile } from 'node:fs/promises';
 
 /**
  * The product claim is that nothing leaves the device. These tests hold the
@@ -89,5 +91,36 @@ test.describe('privacy guarantees', () => {
       manifest.icons.some((i: { purpose?: string }) => i.purpose === 'maskable'),
       'no maskable icon for Android launchers'
     ).toBe(true);
+  });
+});
+
+test.describe('large file handling', () => {
+  test('keeps results in OPFS rather than main-thread memory', async ({ page }) => {
+    await page.goto('/#/tool/merge-pdf');
+
+    const before = await page.evaluate(
+      () => 'storage' in navigator && 'getDirectory' in navigator.storage
+    );
+    expect(before, 'OPFS should be available in this browser').toBe(true);
+
+    await page
+      .locator('#dz-file-input')
+      .first()
+      .setInputFiles([await pdfFile('big-a.pdf', 120), await pdfFile('big-b.pdf', 120)]);
+    await page.locator('#process-btn').click();
+    await expect(page.locator('#download-btn')).toBeVisible({ timeout: 60_000 });
+
+    // The href must resolve; an OPFS entry deleted too early would break it.
+    const href = await page.locator('#download-btn').getAttribute('href');
+    expect(href).toMatch(/^blob:/);
+
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      page.locator('#download-btn').click(),
+    ]);
+    expect(await download.failure()).toBeNull();
+
+    const pdf = await PDFDocument.load(await readFile(await download.path()));
+    expect(pdf.getPageCount()).toBe(240);
   });
 });

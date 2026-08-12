@@ -46,7 +46,10 @@ export async function runSingle(session: ToolSession): Promise<void> {
     });
 
     recordRecentTool(tool.id);
-    session.downloadCleanup = cleanup;
+    session.downloadCleanup = () => {
+      cleanup();
+      result.release?.();
+    };
   } catch (err) {
     reportFailure(session, err);
   }
@@ -90,7 +93,10 @@ export async function runBatch(session: ToolSession): Promise<void> {
     });
 
     recordRecentTool(tool.id);
-    session.downloadCleanup = cleanup;
+    session.downloadCleanup = () => {
+      cleanup();
+      for (const item of results) item.release?.();
+    };
   } catch (err) {
     if (cancelled) return;
     reportFailure(session, err);

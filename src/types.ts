@@ -61,13 +61,19 @@ export interface DropZoneConfig {
 export interface WorkerRequest {
   id: string;
   toolId: string;
-  buffers: ArrayBuffer[];
-  fileNames: string[];
-  fileMimes: string[];
+  /**
+   * The File objects themselves. Structured clone passes the underlying blob
+   * by reference, so the bytes are only read once - inside the worker - rather
+   * than being loaded into main-thread memory first.
+   */
+  files: File[];
   options: Record<string, unknown>;
 }
 
 export type WorkerResponse =
   | { type: 'progress'; id: string; percent: number }
+  /** Result written to OPFS; `name` is the entry to read it back from. */
+  | { type: 'result-file'; id: string; name: string; filename: string; mime: string }
+  /** Result transferred directly, for browsers without OPFS. */
   | { type: 'result'; id: string; buffer: ArrayBuffer; filename: string; mime: string }
   | { type: 'error'; id: string; message: string };

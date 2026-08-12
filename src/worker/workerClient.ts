@@ -1,11 +1,24 @@
 import type { WorkerRequest, WorkerResponse } from '../types';
 import { getToolById } from '../tools/registry';
 import { validateToolOptions } from '../tools/optionsSchema';
+import { readResult, deleteResult } from './opfs';
 
 type ProgressCallback = (percent: number) => void;
 
+/** What a finished job hands back, ready to download. */
+export interface ToolOutput {
+  blob: Blob;
+  filename: string;
+  /**
+   * Frees the backing store, once the blob is no longer needed. An OPFS-backed
+   * result is a handle to a file on disk: delete it while a download is still
+   * pointing at it and the download fails.
+   */
+  release?: () => void;
+}
+
 interface PendingRequest {
-  resolve: (value: { buffer: ArrayBuffer; filename: string; mime: string }) => void;
+  resolve: (value: ToolOutput) => void;
   reject: (reason: Error) => void;
   onProgress: ProgressCallback;
 }
@@ -45,13 +58,22 @@ function spawnWorker(): Worker {
     if (!req) return;
     if (msg.type === 'progress') {
       req.onProgress(msg.percent);
-    } else if (msg.type === 'result') {
-      pending.delete(msg.id);
-      req.resolve({ buffer: msg.buffer, filename: msg.filename, mime: msg.mime });
-    } else if (msg.type === 'error') {
-      pending.delete(msg.id);
-      req.reject(new Error(msg.message));
+      return;
     }
+
+    pending.delete(msg.id);
+
+    if (msg.type === 'result') {
+      req.resolve({ blob: new Blob([msg.buffer], { type: msg.mime }), filename: msg.filename });
+      return;
+    }
+
+    if (msg.type === 'result-file') {
+      void resolveFromOpfs(msg, req);
+      return;
+    }
+
+    req.reject(new Error(msg.message));
   };
 
   w.onerror = (e) => {
@@ -80,15 +102,38 @@ export function cancelCurrentTool(): void {
   pendingByWorker.clear();
 }
 
+/**
+ * Turns an OPFS-backed result into a File the browser can stream from disk,
+ * and drops the entry so results do not accumulate. If reading it back fails,
+ * the job fails rather than silently handing back nothing.
+ */
+async function resolveFromOpfs(
+  msg: Extract<WorkerResponse, { type: 'result-file' }>,
+  req: PendingRequest
+): Promise<void> {
+  const file = await readResult(msg.name, msg.mime);
+  if (!file) {
+    req.reject(new Error('The result could not be read back from browser storage.'));
+    return;
+  }
+
+  req.resolve({
+    blob: file,
+    filename: msg.filename,
+    release: () => void deleteResult(msg.name),
+  });
+}
+
 function dispatchToWorker(
   w: Worker,
   request: WorkerRequest,
   onProgress: ProgressCallback
-): Promise<{ buffer: ArrayBuffer; filename: string; mime: string }> {
+): Promise<ToolOutput> {
   const pending = pendingByWorker.get(w)!;
   return new Promise((resolve, reject) => {
     pending.set(request.id, { resolve, reject, onProgress });
-    w.postMessage(request, request.buffers);
+    // Files are structured-cloned by reference; nothing is copied here.
+    w.postMessage(request);
   });
 }
 
@@ -110,20 +155,14 @@ export async function runTool(
   files: File[],
   options: Record<string, unknown>,
   onProgress: ProgressCallback
-): Promise<{ blob: Blob; filename: string }> {
-  const id = String(++idCounter);
-  const validated = checkedOptions(toolId, options);
-  const buffers = await Promise.all(files.map((f) => f.arrayBuffer()));
+): Promise<ToolOutput> {
   const request: WorkerRequest = {
-    id,
+    id: String(++idCounter),
     toolId,
-    buffers,
-    fileNames: files.map((f) => f.name),
-    fileMimes: files.map((f) => f.type),
-    options: validated,
+    files,
+    options: checkedOptions(toolId, options),
   };
-  const result = await dispatchToWorker(getWorker(0), request, onProgress);
-  return { blob: new Blob([result.buffer], { type: result.mime }), filename: result.filename };
+  return dispatchToWorker(getWorker(0), request, onProgress);
 }
 
 export async function runToolBatch(
@@ -132,7 +171,7 @@ export async function runToolBatch(
   options: Record<string, unknown>,
   onProgress: ProgressCallback,
   onFileProgress?: (done: number, total: number) => void
-): Promise<{ blob: Blob; filename: string }[]> {
+): Promise<ToolOutput[]> {
   const total = files.length;
   if (total === 0) return [];
 
@@ -157,16 +196,13 @@ export async function runToolBatch(
 
   const groupResults = await Promise.all(
     groups.map(async (entries, wi) => {
-      const results: { idx: number; blob: Blob; filename: string }[] = [];
+      const results: { idx: number; blob: Blob; filename: string; release?: () => void }[] = [];
       for (const { idx, file } of entries) {
         wp[wi].current = 0;
-        const buf = await file.arrayBuffer();
         const req: WorkerRequest = {
           id: String(++idCounter),
           toolId,
-          buffers: [buf],
-          fileNames: [file.name],
-          fileMimes: [file.type],
+          files: [file],
           options: validated,
         };
         const result = await dispatchToWorker(getWorker(wi), req, (pct) => {
@@ -180,8 +216,9 @@ export async function runToolBatch(
         onFileProgress?.(totalFilesCompleted, total);
         results.push({
           idx,
-          blob: new Blob([result.buffer], { type: result.mime }),
+          blob: result.blob,
           filename: result.filename,
+          release: result.release,
         });
       }
       return results;
@@ -191,5 +228,5 @@ export async function runToolBatch(
   // Flatten and sort by original index to restore input order
   const flat = groupResults.flat().sort((a, b) => a.idx - b.idx);
   onProgress(100);
-  return flat.map(({ blob, filename }) => ({ blob, filename }));
+  return flat.map(({ blob, filename, release }) => ({ blob, filename, release }));
 }
