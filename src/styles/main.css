@@ -3,6 +3,7 @@
    Layers load in cascade order; later files intentionally override earlier
    ones. Keep this order when adding a file. */
 
+@import './fonts.css';
 @import './tokens.css';
 @import './base.css';
 @import './components/navbar.css';

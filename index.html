@@ -8,27 +8,32 @@
       name="description"
       content="OffFile: browser-based file tools. Merge PDFs, convert images, and more - 100% offline, no uploads, no tracking."
     />
-    <!-- CSP: no external data connections; fonts from Google only; workers via blob/self -->
+    <meta name="theme-color" content="#ffe600" />
+
+    <!-- Everything the page needs ships with it. No host other than 'self' is
+         reachable, which is what makes the offline and no-tracking claims
+         enforceable rather than a promise. -->
     <meta
       http-equiv="Content-Security-Policy"
       content="
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' blob:;
-    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-    font-src 'self' https://fonts.gstatic.com;
-    img-src 'self' data: blob:;
-    worker-src 'self' blob:;
-    connect-src 'self';
-    object-src 'none';
-    base-uri 'self';
-  "
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' blob:;
+        style-src 'self' 'unsafe-inline';
+        font-src 'self';
+        img-src 'self' data: blob:;
+        media-src 'self' blob:;
+        worker-src 'self' blob:;
+        connect-src 'self' blob:;
+        form-action 'none';
+        frame-ancestors 'none';
+        object-src 'none';
+        base-uri 'self';
+      "
     />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Oswald:wght@500;700&family=Space+Grotesk:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+
+    <!-- vite-plugin-pwa injects the manifest link at build time. -->
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
   </head>
   <body>
     <div id="app"></div>

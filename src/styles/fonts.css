@@ -1,0 +1,29 @@
+/* Self-hosted fonts.
+
+   These used to load from fonts.googleapis.com, which sent every visitor's IP
+   to Google before a single file was processed - awkward for a tool that
+   promises nothing leaves your device. The @fontsource packages ship the same
+   woff2 files, bundled with the app, so the first paint needs no third party
+   and the offline build is genuinely self-contained.
+
+   Only the latin and latin-ext subsets are included: latin-ext carries the
+   Turkish, Polish and Czech letters the UI will need, while cyrillic, greek
+   and vietnamese would triple the number of files the service worker
+   precaches for no one currently reading them. */
+
+@import '@fontsource/oswald/latin-500.css';
+@import '@fontsource/oswald/latin-700.css';
+@import '@fontsource/oswald/latin-ext-500.css';
+@import '@fontsource/oswald/latin-ext-700.css';
+
+@import '@fontsource/space-grotesk/latin-400.css';
+@import '@fontsource/space-grotesk/latin-500.css';
+@import '@fontsource/space-grotesk/latin-700.css';
+@import '@fontsource/space-grotesk/latin-ext-400.css';
+@import '@fontsource/space-grotesk/latin-ext-500.css';
+@import '@fontsource/space-grotesk/latin-ext-700.css';
+
+@import '@fontsource/ibm-plex-mono/latin-500.css';
+@import '@fontsource/ibm-plex-mono/latin-700.css';
+@import '@fontsource/ibm-plex-mono/latin-ext-500.css';
+@import '@fontsource/ibm-plex-mono/latin-ext-700.css';
