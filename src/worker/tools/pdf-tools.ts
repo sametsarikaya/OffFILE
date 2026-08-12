@@ -347,7 +347,50 @@ async function compressPdf(
   options: Record<string, unknown>,
   onProgress: ProgressFn
 ): Promise<ProcessResult> {
-  const quality = (options.quality as string) || 'medium';
+  const mode = (options.mode as string) || 'lossless';
+  const base = fileNames[0].replace(/\.pdf$/i, '');
+
+  const buffer =
+    mode === 'raster'
+      ? await rasteriseToPdf(buffers[0], (options.quality as string) || 'medium', onProgress)
+      : await repackLossless(buffers[0], onProgress);
+
+  onProgress(100);
+  return {
+    buffer,
+    filename: `${base}_compressed.pdf`,
+    mime: 'application/pdf',
+  };
+}
+
+/**
+ * Rewrites the document with object streams and without pdf-lib's per-object
+ * padding. Text, links and metadata survive; the saving comes from a tighter
+ * file structure and from dropping anything the page tree no longer references.
+ *
+ * Gains are modest on an already-tidy PDF and large on one exported by an
+ * office suite, which is exactly when a user reaches for this tool.
+ */
+async function repackLossless(source: ArrayBuffer, onProgress: ProgressFn): Promise<ArrayBuffer> {
+  onProgress(15);
+  const doc = await PDFDocument.load(source, { updateMetadata: false });
+  onProgress(50);
+
+  const bytes = await doc.save({ useObjectStreams: true, addDefaultPage: false });
+  onProgress(90);
+
+  // If the rewrite came out larger - already-optimised input - hand back the
+  // original rather than a worse file.
+  if (bytes.byteLength >= source.byteLength) return source.slice(0);
+  return bytes.buffer as ArrayBuffer;
+}
+
+/** Renders every page to JPEG and rebuilds the document from those images. */
+async function rasteriseToPdf(
+  source: ArrayBuffer,
+  quality: string,
+  onProgress: ProgressFn
+): Promise<ArrayBuffer> {
   const scaleMap: Record<string, number> = { low: 0.8, medium: 1.2, high: 1.8 };
   const jpegQMap: Record<string, number> = { low: 0.45, medium: 0.65, high: 0.82 };
   const scale = scaleMap[quality] ?? 1.2;
@@ -355,7 +398,7 @@ async function compressPdf(
   onProgress(10);
 
   const pdfDoc = await pdfjsLib.getDocument({
-    data: buffers[0],
+    data: source,
     CanvasFactory: OffscreenCanvasFactory,
   } as Parameters<typeof pdfjsLib.getDocument>[0]).promise;
   const totalPages = pdfDoc.numPages;
@@ -370,23 +413,15 @@ async function compressPdf(
     await page.render({ canvasContext: ctx as unknown as CanvasRenderingContext2D, viewport })
       .promise;
     const jpegBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: jpegQ });
-    const jpegBuf = await jpegBlob.arrayBuffer();
-    const img = await outDoc.embedJpg(jpegBuf);
+    const img = await outDoc.embedJpg(await jpegBlob.arrayBuffer());
     const wPt = viewport.width * (72 / 96);
     const hPt = viewport.height * (72 / 96);
-    const p = outDoc.addPage([wPt, hPt]);
-    p.drawImage(img, { x: 0, y: 0, width: wPt, height: hPt });
+    outDoc.addPage([wPt, hPt]).drawImage(img, { x: 0, y: 0, width: wPt, height: hPt });
     onProgress(15 + (i / totalPages) * 80);
   }
 
   const bytes = await outDoc.save();
-  onProgress(100);
-  const base = fileNames[0].replace(/\.pdf$/i, '');
-  return {
-    buffer: bytes.buffer as ArrayBuffer,
-    filename: `${base}_compressed.pdf`,
-    mime: 'application/pdf',
-  };
+  return bytes.buffer as ArrayBuffer;
 }
 
 async function pdfMetadata(
