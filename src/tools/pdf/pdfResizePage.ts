@@ -3,7 +3,8 @@ import type { Tool } from '../../types';
 const pdfResizePage: Tool = {
   id: 'pdf-resize-page',
   title: 'Resize PDF Pages',
-  description: 'Change all pages to A4, A3, US Letter, or a custom size - keeping content centered.',
+  description:
+    'Change all pages to A4, A3, US Letter, or a custom size - keeping content centered.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="4" y="2" width="16" height="20" rx="1"/>
     <polyline points="8 2 4 2 4 6"/>
@@ -21,10 +22,10 @@ const pdfResizePage: Tool = {
       label: 'Target page size',
       type: 'select',
       options: [
-        { value: 'a4',     label: 'A4 (210 × 297 mm)'     },
-        { value: 'a3',     label: 'A3 (297 × 420 mm)'     },
+        { value: 'a4', label: 'A4 (210 × 297 mm)' },
+        { value: 'a3', label: 'A3 (297 × 420 mm)' },
         { value: 'letter', label: 'US Letter (8.5 × 11 in)' },
-        { value: 'legal',  label: 'US Legal (8.5 × 14 in)'  },
+        { value: 'legal', label: 'US Legal (8.5 × 14 in)' },
       ],
       defaultValue: 'a4',
     },
@@ -33,7 +34,7 @@ const pdfResizePage: Tool = {
       label: 'Orientation',
       type: 'select',
       options: [
-        { value: 'portrait',  label: 'Portrait'  },
+        { value: 'portrait', label: 'Portrait' },
         { value: 'landscape', label: 'Landscape' },
       ],
       defaultValue: 'portrait',

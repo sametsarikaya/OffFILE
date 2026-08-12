@@ -61,7 +61,10 @@ const compressPdf: Tool = {
       canvas.width = viewport.width;
       canvas.height = viewport.height;
 
-      await page.render({ canvas, viewport } as any).promise;
+      // pdf.js accepts `canvas` at runtime; its published types still require
+      // `canvasContext`, so the cast goes through `unknown`.
+      await page.render({ canvas, viewport } as unknown as Parameters<typeof page.render>[0])
+        .promise;
 
       const dataUrl = canvas.toDataURL('image/jpeg', jpegQ);
       const wMM = (viewport.width * 25.4) / 96;

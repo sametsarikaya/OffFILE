@@ -4,7 +4,7 @@ type ProgressCallback = (percent: number) => void;
 
 interface PendingRequest {
   resolve: (value: { buffer: ArrayBuffer; filename: string; mime: string }) => void;
-  reject:  (reason: Error) => void;
+  reject: (reason: Error) => void;
   onProgress: ProgressCallback;
 }
 
@@ -78,10 +78,12 @@ export async function runTool(
   options: Record<string, unknown>,
   onProgress: ProgressCallback
 ): Promise<{ blob: Blob; filename: string }> {
-  const id      = String(++idCounter);
+  const id = String(++idCounter);
   const buffers = await Promise.all(files.map((f) => f.arrayBuffer()));
   const request: WorkerRequest = {
-    id, toolId, buffers,
+    id,
+    toolId,
+    buffers,
     fileNames: files.map((f) => f.name),
     fileMimes: files.map((f) => f.type),
     options,
@@ -124,9 +126,9 @@ export async function runToolBatch(
         wp[wi].current = 0;
         const buf = await file.arrayBuffer();
         const req: WorkerRequest = {
-          id:        String(++idCounter),
+          id: String(++idCounter),
           toolId,
-          buffers:   [buf],
+          buffers: [buf],
           fileNames: [file.name],
           fileMimes: [file.type],
           options,
@@ -140,7 +142,11 @@ export async function runToolBatch(
         totalFilesCompleted++;
         aggregateProgress();
         onFileProgress?.(totalFilesCompleted, total);
-        results.push({ idx, blob: new Blob([result.buffer], { type: result.mime }), filename: result.filename });
+        results.push({
+          idx,
+          blob: new Blob([result.buffer], { type: result.mime }),
+          filename: result.filename,
+        });
       }
       return results;
     })

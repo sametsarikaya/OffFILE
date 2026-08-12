@@ -23,8 +23,8 @@ const pdfAddBlank: Tool = {
       type: 'select',
       options: [
         { value: 'start', label: 'Beginning of document' },
-        { value: 'end',   label: 'End of document'       },
-        { value: 'after', label: 'After page number...'    },
+        { value: 'end', label: 'End of document' },
+        { value: 'after', label: 'After page number...' },
       ],
       defaultValue: 'end',
     },
@@ -42,9 +42,9 @@ const pdfAddBlank: Tool = {
       label: 'Blank page size',
       type: 'select',
       options: [
-        { value: 'match',  label: 'Match existing pages' },
-        { value: 'a4',     label: 'A4'                   },
-        { value: 'letter', label: 'US Letter'            },
+        { value: 'match', label: 'Match existing pages' },
+        { value: 'a4', label: 'A4' },
+        { value: 'letter', label: 'US Letter' },
       ],
       defaultValue: 'match',
     },

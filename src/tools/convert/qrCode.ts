@@ -3,7 +3,8 @@ import type { Tool } from '../../types';
 const qrCode: Tool = {
   id: 'qr-code',
   title: 'QR Code Generator',
-  description: 'Generate a QR code from any text or URL. Exported as PNG, nothing leaves your browser.',
+  description:
+    'Generate a QR code from any text or URL. Exported as PNG, nothing leaves your browser.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="2" y="2" width="8" height="8" rx="1"/>
     <rect x="14" y="2" width="8" height="8" rx="1"/>
@@ -35,8 +36,8 @@ const qrCode: Tool = {
       label: 'Output Size (px)',
       type: 'select',
       options: [
-        { value: '256',  label: '256 × 256' },
-        { value: '512',  label: '512 × 512' },
+        { value: '256', label: '256 × 256' },
+        { value: '512', label: '512 × 512' },
         { value: '1024', label: '1024 × 1024' },
       ],
       defaultValue: '512',

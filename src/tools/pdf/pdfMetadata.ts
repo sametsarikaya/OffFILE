@@ -12,7 +12,8 @@ interface MetaField {
 const pdfMetadata: Tool = {
   id: 'pdf-metadata',
   title: 'PDF Metadata',
-  description: 'View and edit the hidden metadata (title, author, creator, keywords) inside a PDF. Edit individual fields or strip everything.',
+  description:
+    'View and edit the hidden metadata (title, author, creator, keywords) inside a PDF. Edit individual fields or strip everything.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
     <polyline points="14 2 14 8 20 8"/>
@@ -34,8 +35,8 @@ const pdfMetadata: Tool = {
     loading.innerHTML = `<span class="process-btn__spinner" aria-hidden="true"></span><span>Reading PDF metadata…</span>`;
     wrap.appendChild(loading);
 
-    let fields: MetaField[] = [];
-    let pageCount = 0;
+    let fields: MetaField[];
+    let pageCount: number;
 
     try {
       const buf = await file.arrayBuffer();
@@ -43,17 +44,30 @@ const pdfMetadata: Tool = {
       pageCount = doc.getPageCount();
 
       const kw = doc.getKeywords();
-      const kwStr = Array.isArray(kw)
-        ? kw.join(', ')
-        : (typeof kw === 'string' ? kw : '');
+      const kwStr = Array.isArray(kw) ? kw.join(', ') : typeof kw === 'string' ? kw : '';
 
       fields = [
-        { id: 'title',    label: 'Title',    value: doc.getTitle()    ?? '', hint: 'Document title' },
-        { id: 'author',   label: 'Author',   value: doc.getAuthor()   ?? '', hint: 'Author name' },
-        { id: 'subject',  label: 'Subject',  value: doc.getSubject()  ?? '', hint: 'Topic or description' },
-        { id: 'keywords', label: 'Keywords', value: kwStr,                   hint: 'Comma-separated keywords' },
-        { id: 'creator',  label: 'Creator',  value: doc.getCreator()  ?? '', hint: 'Application that created the PDF' },
-        { id: 'producer', label: 'Producer', value: doc.getProducer() ?? '', hint: 'PDF library that wrote the file' },
+        { id: 'title', label: 'Title', value: doc.getTitle() ?? '', hint: 'Document title' },
+        { id: 'author', label: 'Author', value: doc.getAuthor() ?? '', hint: 'Author name' },
+        {
+          id: 'subject',
+          label: 'Subject',
+          value: doc.getSubject() ?? '',
+          hint: 'Topic or description',
+        },
+        { id: 'keywords', label: 'Keywords', value: kwStr, hint: 'Comma-separated keywords' },
+        {
+          id: 'creator',
+          label: 'Creator',
+          value: doc.getCreator() ?? '',
+          hint: 'Application that created the PDF',
+        },
+        {
+          id: 'producer',
+          label: 'Producer',
+          value: doc.getProducer() ?? '',
+          hint: 'PDF library that wrote the file',
+        },
       ];
     } catch {
       loading.remove();
@@ -66,7 +80,9 @@ const pdfMetadata: Tool = {
 
     // Initialize options with current values, default to edit mode
     options['mode'] = 'edit';
-    fields.forEach((f) => { options[f.id] = f.value; });
+    fields.forEach((f) => {
+      options[f.id] = f.value;
+    });
 
     // Header
     const header = document.createElement('div');
@@ -111,7 +127,8 @@ const pdfMetadata: Tool = {
 
       const input = document.createElement('input');
       input.type = 'text';
-      input.className = 'metadata-field-row__input' + (isEmpty ? ' metadata-field-row__input--empty' : '');
+      input.className =
+        'metadata-field-row__input' + (isEmpty ? ' metadata-field-row__input--empty' : '');
       input.value = field.value;
       input.placeholder = field.hint ?? '';
       input.setAttribute('autocomplete', 'off');
@@ -159,10 +176,14 @@ const pdfMetadata: Tool = {
       fieldsDiv.querySelectorAll<HTMLInputElement>('.metadata-field-row__input').forEach((inp) => {
         inp.value = '';
         inp.classList.add('metadata-field-row__input--empty');
-        const btn = inp.parentElement?.querySelector<HTMLButtonElement>('.metadata-field-row__clear');
+        const btn = inp.parentElement?.querySelector<HTMLButtonElement>(
+          '.metadata-field-row__clear'
+        );
         if (btn) btn.disabled = true;
       });
-      fields.forEach((f) => { options[f.id] = ''; });
+      fields.forEach((f) => {
+        options[f.id] = '';
+      });
     });
     clearAllRow.appendChild(clearAllBtn);
     wrap.appendChild(clearAllRow);

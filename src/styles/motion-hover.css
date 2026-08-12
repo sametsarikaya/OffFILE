@@ -4,11 +4,7 @@
   --hover-intensity: 30%;
   --hover-duration: var(--motion-fast);
 
-  --dropzone-stripe-color: color-mix(
-    in srgb,
-    var(--color-border) 14%,
-    transparent
-  );
+  --dropzone-stripe-color: color-mix(in srgb, var(--color-border) 14%, transparent);
 
   --dropzone-hover-bg: color-mix(
     in srgb,
@@ -17,33 +13,21 @@
   );
 
   --process-btn-hover-shadow: 8px 8px 0px
-    color-mix(
-      in srgb,
-      var(--color-primary) var(--hover-intensity),
-      var(--color-border)
-    );
+    color-mix(in srgb, var(--color-primary) var(--hover-intensity), var(--color-border));
   --download-btn-hover-shadow: 8px 8px 0px
-    color-mix(
-      in srgb,
-      var(--color-primary) var(--hover-intensity),
-      var(--color-border)
-    );
+    color-mix(in srgb, var(--color-primary) var(--hover-intensity), var(--color-border));
 }
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   --hover-intensity: 38%;
 
   --nav-hover-bg: color-mix(in srgb, var(--color-primary) 86%, #1a1208);
   --hover-contrast-text: #22170c;
 
-  --nav-hover-shadow: 4px 4px 0
-    color-mix(in srgb, var(--color-primary) 52%, #000);
-  --theme-btn-hover-shadow: 5px 5px 0
-    color-mix(in srgb, var(--color-primary) 42%, #000);
-  --process-btn-hover-shadow: 8px 8px 0
-    color-mix(in srgb, var(--color-primary) 38%, #000);
-  --download-btn-hover-shadow: 8px 8px 0
-    color-mix(in srgb, var(--color-cta) 38%, #000);
+  --nav-hover-shadow: 4px 4px 0 color-mix(in srgb, var(--color-primary) 52%, #000);
+  --theme-btn-hover-shadow: 5px 5px 0 color-mix(in srgb, var(--color-primary) 42%, #000);
+  --process-btn-hover-shadow: 8px 8px 0 color-mix(in srgb, var(--color-primary) 38%, #000);
+  --download-btn-hover-shadow: 8px 8px 0 color-mix(in srgb, var(--color-cta) 38%, #000);
 
   --dropzone-stripe-color: rgba(255, 255, 255, 0.07);
 }

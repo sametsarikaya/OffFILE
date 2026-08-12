@@ -47,7 +47,9 @@ export function createToolCard(tool: Tool, index = 0): HTMLElement {
     starBtn.setAttribute('aria-pressed', String(nowFav));
     starBtn.setAttribute('aria-label', nowFav ? 'Remove from favorites' : 'Add to favorites');
     // Bubble a custom event so the home page can re-render the favorites section and sync all star buttons.
-    card.dispatchEvent(new CustomEvent<string>('favorite-changed', { bubbles: true, detail: tool.id }));
+    card.dispatchEvent(
+      new CustomEvent<string>('favorite-changed', { bubbles: true, detail: tool.id })
+    );
   });
 
   card.addEventListener('click', navigate);

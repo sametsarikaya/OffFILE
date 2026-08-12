@@ -1,10 +1,10 @@
 const SHORTCUTS: { key: string; desc: string }[] = [
-  { key: '?',         desc: 'Open/close the shortcuts panel' },
-  { key: 'Esc',       desc: 'Go home / close the modal' },
-  { key: 'Enter',     desc: 'Start processing (when a file is selected)' },
+  { key: '?', desc: 'Open/close the shortcuts panel' },
+  { key: 'Esc', desc: 'Go home / close the modal' },
+  { key: 'Enter', desc: 'Start processing (when a file is selected)' },
   { key: 'Drag & Drop', desc: 'Drop a file anywhere on the page' },
-  { key: 'Tab',       desc: 'Navigate between controls' },
-  { key: 'Space',     desc: 'Run the focused tool card' },
+  { key: 'Tab', desc: 'Navigate between controls' },
+  { key: 'Space', desc: 'Run the focused tool card' },
 ];
 
 let modalEl: HTMLElement | null = null;
@@ -31,12 +31,14 @@ export function showShortcutsModal(): void {
       </div>
       <table class="shortcuts-modal__table">
         <tbody>
-          ${SHORTCUTS.map((s) => `
+          ${SHORTCUTS.map(
+            (s) => `
             <tr>
               <td><kbd class="shortcuts-modal__key">${s.key}</kbd></td>
               <td class="shortcuts-modal__desc">${s.desc}</td>
             </tr>
-          `).join('')}
+          `
+          ).join('')}
         </tbody>
       </table>
       <p class="shortcuts-modal__hint">Press <kbd class="shortcuts-modal__key">Esc</kbd> or click outside to close</p>
@@ -59,10 +61,14 @@ export function showShortcutsModal(): void {
 export function hideShortcutsModal(): void {
   if (!modalEl) return;
   modalEl.classList.remove('is-visible');
-  modalEl.addEventListener('transitionend', () => {
-    modalEl?.remove();
-    modalEl = null;
-  }, { once: true });
+  modalEl.addEventListener(
+    'transitionend',
+    () => {
+      modalEl?.remove();
+      modalEl = null;
+    },
+    { once: true }
+  );
 }
 
 export function isShortcutsModalOpen(): boolean {

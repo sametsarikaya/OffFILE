@@ -10,21 +10,25 @@ const THUMB_LONG = 160;
 
 async function renderThumbs(file: File): Promise<{ dataUrl: string; pageNum: number }[]> {
   const buffer = await file.arrayBuffer();
-  const pdf    = await pdfjsLib.getDocument({ data: buffer }).promise;
-  const total  = pdf.numPages;
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+  const total = pdf.numPages;
   const result: { dataUrl: string; pageNum: number }[] = [];
 
   for (let i = 1; i <= total; i++) {
-    const page     = await pdf.getPage(i);
-    const vp       = page.getViewport({ scale: 1 });
-    const scale    = THUMB_LONG / Math.max(vp.width, vp.height);
+    const page = await pdf.getPage(i);
+    const vp = page.getViewport({ scale: 1 });
+    const scale = THUMB_LONG / Math.max(vp.width, vp.height);
     const viewport = page.getViewport({ scale });
-    const canvas   = document.createElement('canvas');
-    canvas.width   = Math.round(viewport.width);
-    canvas.height  = Math.round(viewport.height);
-    await page.render({ canvasContext: canvas.getContext('2d') as CanvasRenderingContext2D, viewport }).promise;
-    result.push({ dataUrl: canvas.toDataURL('image/jpeg', 0.80), pageNum: i });
-    canvas.width = 0; canvas.height = 0;
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(viewport.width);
+    canvas.height = Math.round(viewport.height);
+    await page.render({
+      canvasContext: canvas.getContext('2d') as CanvasRenderingContext2D,
+      viewport,
+    }).promise;
+    result.push({ dataUrl: canvas.toDataURL('image/jpeg', 0.8), pageNum: i });
+    canvas.width = 0;
+    canvas.height = 0;
   }
   return result;
 }
@@ -51,7 +55,7 @@ const pdfToImage: Tool = {
       label: 'Output format',
       type: 'select',
       options: [
-        { value: 'image/png',  label: 'PNG (lossless)' },
+        { value: 'image/png', label: 'PNG (lossless)' },
         { value: 'image/jpeg', label: 'JPEG (smaller)' },
       ],
       defaultValue: 'image/png',
@@ -72,7 +76,7 @@ const pdfToImage: Tool = {
     wrap.dataset.loading = 'true';
 
     const thumbs = await renderThumbs(file);
-    const total  = thumbs.length;
+    const total = thumbs.length;
     wrap.dataset.loading = 'false';
     wrap.dispatchEvent(new CustomEvent('panel-ready', { bubbles: true }));
     loading.remove();
@@ -80,7 +84,7 @@ const pdfToImage: Tool = {
     // Default: all pages selected
     const selected = new Set<number>(thumbs.map((t) => t.pageNum));
 
-    let counterEl: HTMLElement;
+    const counterEl = document.createElement('span');
 
     const syncPages = () => {
       const sorted = [...selected].sort((a, b) => a - b);
@@ -104,13 +108,19 @@ const pdfToImage: Tool = {
     const fmtSelect = document.createElement('select');
     fmtSelect.id = 'pti-format';
     fmtSelect.className = 'option-group__select';
-    [['image/png', 'PNG (lossless)'], ['image/jpeg', 'JPEG (smaller)']].forEach(([v, l]) => {
+    [
+      ['image/png', 'PNG (lossless)'],
+      ['image/jpeg', 'JPEG (smaller)'],
+    ].forEach(([v, l]) => {
       const opt = document.createElement('option');
-      opt.value = v; opt.textContent = l;
+      opt.value = v;
+      opt.textContent = l;
       if (v === String(options.format ?? 'image/png')) opt.selected = true;
       fmtSelect.appendChild(opt);
     });
-    fmtSelect.addEventListener('change', () => { options.format = fmtSelect.value; });
+    fmtSelect.addEventListener('change', () => {
+      options.format = fmtSelect.value;
+    });
     fmtRow.appendChild(fmtLabel);
     fmtRow.appendChild(fmtSelect);
     wrap.appendChild(fmtRow);
@@ -118,7 +128,6 @@ const pdfToImage: Tool = {
     // Header with page counter
     const hdr = document.createElement('div');
     hdr.className = 'reorder-header';
-    counterEl = document.createElement('span');
     counterEl.className = 'reorder-header__count';
     hdr.innerHTML = `<span class="reorder-header__title">Click pages to select / deselect</span>`;
     hdr.appendChild(counterEl);
@@ -166,7 +175,12 @@ const pdfToImage: Tool = {
           syncPages();
         };
         item.addEventListener('click', toggle);
-        item.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        });
 
         grid.appendChild(item);
       });
@@ -180,18 +194,23 @@ const pdfToImage: Tool = {
     actRow.className = 'split-actions';
 
     const selAllBtn = document.createElement('button');
-    selAllBtn.type = 'button'; selAllBtn.className = 'reorder-reset-btn';
+    selAllBtn.type = 'button';
+    selAllBtn.className = 'reorder-reset-btn';
     selAllBtn.textContent = 'Select All';
     selAllBtn.addEventListener('click', () => {
       thumbs.forEach(({ pageNum }) => selected.add(pageNum));
-      buildGrid(); syncPages();
+      buildGrid();
+      syncPages();
     });
 
     const clearBtn = document.createElement('button');
-    clearBtn.type = 'button'; clearBtn.className = 'reorder-reset-btn';
+    clearBtn.type = 'button';
+    clearBtn.className = 'reorder-reset-btn';
     clearBtn.textContent = 'Clear';
     clearBtn.addEventListener('click', () => {
-      selected.clear(); buildGrid(); syncPages();
+      selected.clear();
+      buildGrid();
+      syncPages();
     });
 
     actRow.appendChild(selAllBtn);

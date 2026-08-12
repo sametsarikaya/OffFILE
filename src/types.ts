@@ -81,5 +81,5 @@ export interface WorkerRequest {
 
 export type WorkerResponse =
   | { type: 'progress'; id: string; percent: number }
-  | { type: 'result';   id: string; buffer: ArrayBuffer; filename: string; mime: string }
-  | { type: 'error';    id: string; message: string };
+  | { type: 'result'; id: string; buffer: ArrayBuffer; filename: string; mime: string }
+  | { type: 'error'; id: string; message: string };

@@ -105,16 +105,22 @@ export function showDownload(
   // previewUrl is set asynchronously by renderDownloadPreview; keep it in closure
   // so cleanup() always revokes it regardless of when it was assigned.
   let previewUrl: string | null = null;
-  const setPreviewUrl = (u: string) => { previewUrl = u; };
+  const setPreviewUrl = (u: string) => {
+    previewUrl = u;
+  };
 
   const cleanup = () => {
-    if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+      previewUrl = null;
+    }
     URL.revokeObjectURL(url);
     extraUrls.forEach((item) => URL.revokeObjectURL(item.url));
   };
 
   const sizeStr = formatFileSize(blob.size);
-  const isShareSupported = enableShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+  const isShareSupported =
+    enableShare && typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 
   const lastDot = filename.lastIndexOf('.');
   const baseName = lastDot > 0 ? filename.substring(0, lastDot) : filename;
@@ -213,7 +219,9 @@ function setupExtraList(
   container: HTMLElement,
   extraUrls: { filename: string; url: string }[]
 ): void {
-  const list = container.querySelector('#download-list .download-area__list-items') as HTMLUListElement;
+  const list = container.querySelector(
+    '#download-list .download-area__list-items'
+  ) as HTMLUListElement;
   extraUrls.forEach((item) => {
     const li = document.createElement('li');
     li.className = 'download-area__list-item';
@@ -235,7 +243,9 @@ function setupShareButton(
   shareBtn?.addEventListener('click', async () => {
     const newName = (filenameInput.value.trim() || baseName) + ext;
     try {
-      const fileToShare = new File([blob], newName, { type: blob.type || 'application/octet-stream' });
+      const fileToShare = new File([blob], newName, {
+        type: blob.type || 'application/octet-stream',
+      });
       if (navigator.canShare?.({ files: [fileToShare] })) {
         await navigator.share({ files: [fileToShare], title: newName });
       } else {
@@ -286,7 +296,9 @@ function setupDownloadAllButton(
     try {
       const zip = new JSZip();
       zip.file(defaultName, blob);
-      extraUrls.forEach((entry) => { zip.file(entry.filename, entry.blob); });
+      extraUrls.forEach((entry) => {
+        zip.file(entry.filename, entry.blob);
+      });
 
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       const zipUrl = URL.createObjectURL(zipBlob);
@@ -311,7 +323,9 @@ function setupDownloadAllButton(
 
 function flashButton(btn: HTMLButtonElement, tempLabel: string, resetLabel: string): void {
   btn.textContent = tempLabel;
-  window.setTimeout(() => { btn.textContent = resetLabel; }, 1200);
+  window.setTimeout(() => {
+    btn.textContent = resetLabel;
+  }, 1200);
 }
 
 export function showError(
@@ -380,7 +394,8 @@ async function renderDownloadPreview(
   }
 
   if (!isTextPreview(blob, filename)) {
-    previewBody.innerHTML = '<p class="download-area__preview-note">Preview is not available for this file type.</p>';
+    previewBody.innerHTML =
+      '<p class="download-area__preview-note">Preview is not available for this file type.</p>';
     return;
   }
 
@@ -392,7 +407,8 @@ async function renderDownloadPreview(
     const pre = previewBody.querySelector('.download-area__preview-text') as HTMLPreElement;
     pre.textContent = clipped || '(empty output)';
   } catch {
-    previewBody.innerHTML = '<p class="download-area__preview-note">Preview could not be generated for this output.</p>';
+    previewBody.innerHTML =
+      '<p class="download-area__preview-note">Preview could not be generated for this output.</p>';
   }
 }
 

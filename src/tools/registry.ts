@@ -1,47 +1,47 @@
 import type { Tool } from '../types';
 
 // PDF Tools
-import mergePdf        from './pdf/mergePdf';
-import splitPdf        from './pdf/splitPdf';
+import mergePdf from './pdf/mergePdf';
+import splitPdf from './pdf/splitPdf';
 import extractPagesPdf from './pdf/extractPagesPdf';
-import removePdfPages  from './pdf/removePdfPages';
-import rotatePdf       from './pdf/rotatePdf';
-import watermarkPdf    from './pdf/watermarkPdf';
-import pageNumbersPdf  from './pdf/pageNumbersPdf';
-import compressPdf     from './pdf/compressPdf';
-import pdfMetadata     from './pdf/pdfMetadata';
+import removePdfPages from './pdf/removePdfPages';
+import rotatePdf from './pdf/rotatePdf';
+import watermarkPdf from './pdf/watermarkPdf';
+import pageNumbersPdf from './pdf/pageNumbersPdf';
+import compressPdf from './pdf/compressPdf';
+import pdfMetadata from './pdf/pdfMetadata';
 import pdfReorderPages from './pdf/pdfReorderPages';
-import pdfAddBlank     from './pdf/pdfAddBlank';
-import pdfResizePage   from './pdf/pdfResizePage';
-import pdfUnlock       from './pdf/pdfUnlock';
+import pdfAddBlank from './pdf/pdfAddBlank';
+import pdfResizePage from './pdf/pdfResizePage';
+import pdfUnlock from './pdf/pdfUnlock';
 
 // Image Tools
-import imageConvert   from './image/imageConvert';
-import imageCompress  from './image/imageCompress';
-import imageResize    from './image/imageResize';
-import imageRotate    from './image/imageRotate';
-import imageFlip      from './image/imageFlip';
+import imageConvert from './image/imageConvert';
+import imageCompress from './image/imageCompress';
+import imageResize from './image/imageResize';
+import imageRotate from './image/imageRotate';
+import imageFlip from './image/imageFlip';
 import imageWatermark from './image/imageWatermark';
-import imageFilters   from './image/imageFilters';
+import imageFilters from './image/imageFilters';
 import imageGrayscale from './image/imageGrayscale';
-import imageAddBg     from './image/imageAddBg';
-import imageMerge     from './image/imageMerge';
-import stripMetadata  from './image/stripMetadata';
-import colorPalette   from './image/colorPalette';
-import imageCrop      from './image/imageCrop';
-import imageCollage   from './image/imageCollage';
+import imageAddBg from './image/imageAddBg';
+import imageMerge from './image/imageMerge';
+import stripMetadata from './image/stripMetadata';
+import colorPalette from './image/colorPalette';
+import imageCrop from './image/imageCrop';
+import imageCollage from './image/imageCollage';
 
 // Convert Tools
-import pdfToImage    from './pdf/pdfToImage';
-import pdfToText     from './pdf/pdfToText';
-import imageToPdf    from './image/imageToPdf';
+import pdfToImage from './pdf/pdfToImage';
+import pdfToText from './pdf/pdfToText';
+import imageToPdf from './image/imageToPdf';
 import imageToBase64 from './image/imageToBase64';
-import svgToPng      from './convert/svgToPng';
-import createZip     from './convert/createZip';
-import extractZip    from './convert/extractZip';
-import qrCode        from './convert/qrCode';
-import fileHash      from './convert/fileHash';
-import textToPdf     from './convert/textToPdf';
+import svgToPng from './convert/svgToPng';
+import createZip from './convert/createZip';
+import extractZip from './convert/extractZip';
+import qrCode from './convert/qrCode';
+import fileHash from './convert/fileHash';
+import textToPdf from './convert/textToPdf';
 import faviconGenerator from './convert/faviconGenerator';
 
 const tools: Tool[] = [
@@ -88,7 +88,9 @@ const tools: Tool[] = [
   faviconGenerator,
 ];
 
-export function getAllTools(): Tool[] { return tools; }
+export function getAllTools(): Tool[] {
+  return tools;
+}
 
 export function getToolById(id: string): Tool | undefined {
   return tools.find((t) => t.id === id);
@@ -99,7 +101,7 @@ export function getToolsByCategory(category: Tool['category']): Tool[] {
 }
 
 export const categories: { id: Tool['category']; label: string; short: string }[] = [
-  { id: 'pdf',     label: 'PDF Tools',     short: 'PDF'     },
-  { id: 'image',   label: 'Image Tools',   short: 'IMAGE'   },
+  { id: 'pdf', label: 'PDF Tools', short: 'PDF' },
+  { id: 'image', label: 'Image Tools', short: 'IMAGE' },
   { id: 'convert', label: 'Convert Tools', short: 'CONVERT' },
 ];

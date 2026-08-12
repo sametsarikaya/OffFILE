@@ -10,7 +10,11 @@ pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
 ).href;
 
 type ProgressFn = (p: number) => void;
-interface ProcessResult { buffer: ArrayBuffer; filename: string; mime: string; }
+interface ProcessResult {
+  buffer: ArrayBuffer;
+  filename: string;
+  mime: string;
+}
 
 export async function dispatch(
   toolId: string,
@@ -18,21 +22,33 @@ export async function dispatch(
   fileNames: string[],
   fileMimes: string[],
   options: Record<string, unknown>,
-  onProgress: ProgressFn,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
   switch (toolId) {
-    case 'pdf-to-image':   return pdfToImage(buffers, fileNames, options, onProgress);
-    case 'pdf-to-text':    return pdfToText(buffers, fileNames, options, onProgress);
-    case 'image-to-pdf':   return imageToPdf(buffers, fileNames, fileMimes, options, onProgress);
-    case 'image-to-base64':return imageToBase64(buffers, fileNames, fileMimes, options, onProgress);
-    case 'svg-to-png':     return svgToPng(buffers, fileNames, fileMimes, options, onProgress);
-    case 'create-zip':     return createZip(buffers, fileNames, options, onProgress);
-    case 'extract-zip':    return extractZip(buffers, fileNames, onProgress);
-    case 'qr-code':        return qrCode(options, onProgress);
-    case 'file-hash':      return fileHash(buffers, fileNames, options, onProgress);
-    case 'text-to-pdf':    return textToPdf(buffers, fileNames, options, onProgress);
-    case 'favicon-generator': return faviconGenerator(buffers, fileNames, fileMimes, options, onProgress);
-    default: throw new Error(`Unknown convert tool: ${toolId}`);
+    case 'pdf-to-image':
+      return pdfToImage(buffers, fileNames, options, onProgress);
+    case 'pdf-to-text':
+      return pdfToText(buffers, fileNames, options, onProgress);
+    case 'image-to-pdf':
+      return imageToPdf(buffers, fileNames, fileMimes, options, onProgress);
+    case 'image-to-base64':
+      return imageToBase64(buffers, fileNames, fileMimes, options, onProgress);
+    case 'svg-to-png':
+      return svgToPng(buffers, fileNames, fileMimes, options, onProgress);
+    case 'create-zip':
+      return createZip(buffers, fileNames, options, onProgress);
+    case 'extract-zip':
+      return extractZip(buffers, fileNames, onProgress);
+    case 'qr-code':
+      return qrCode(options, onProgress);
+    case 'file-hash':
+      return fileHash(buffers, fileNames, options, onProgress);
+    case 'text-to-pdf':
+      return textToPdf(buffers, fileNames, options, onProgress);
+    case 'favicon-generator':
+      return faviconGenerator(buffers, fileNames, fileMimes, options, onProgress);
+    default:
+      throw new Error(`Unknown convert tool: ${toolId}`);
   }
 }
 
@@ -54,18 +70,23 @@ function parsePageRanges(input: string, total: number): number[] {
 }
 
 async function pdfToImage(
-  buffers: ArrayBuffer[], fileNames: string[],
-  options: Record<string, unknown>, onProgress: ProgressFn
+  buffers: ArrayBuffer[],
+  fileNames: string[],
+  options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
-  const format  = (options.format as string) || 'image/png';
-  const ext     = format === 'image/jpeg' ? 'jpg' : 'png';
+  const format = (options.format as string) || 'image/png';
+  const ext = format === 'image/jpeg' ? 'jpg' : 'png';
   const quality = format === 'image/jpeg' ? 0.92 : 1;
-  const SCALE   = 1.5;
+  const SCALE = 1.5;
 
   onProgress(5);
-  const pdfDoc     = await pdfjsLib.getDocument({ data: buffers[0], CanvasFactory: OffscreenCanvasFactory } as Parameters<typeof pdfjsLib.getDocument>[0]).promise;
+  const pdfDoc = await pdfjsLib.getDocument({
+    data: buffers[0],
+    CanvasFactory: OffscreenCanvasFactory,
+  } as Parameters<typeof pdfjsLib.getDocument>[0]).promise;
   const totalPages = pdfDoc.numPages;
-  const base       = fileNames[0].replace(/\.pdf$/i, '');
+  const base = fileNames[0].replace(/\.pdf$/i, '');
 
   const rawPages = String(options.pages || '').trim();
   const pagesToRender = rawPages
@@ -75,14 +96,15 @@ async function pdfToImage(
   if (pagesToRender.length === 0) throw new Error('No pages selected.');
 
   const renderPage = async (pageNum: number) => {
-    const page     = await pdfDoc.getPage(pageNum);
+    const page = await pdfDoc.getPage(pageNum);
     const viewport = page.getViewport({ scale: SCALE });
-    const canvas   = new OffscreenCanvas(Math.round(viewport.width), Math.round(viewport.height));
-    const ctx      = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
+    const canvas = new OffscreenCanvas(Math.round(viewport.width), Math.round(viewport.height));
+    const ctx = canvas.getContext('2d') as OffscreenCanvasRenderingContext2D;
     ctx.fillStyle = '#ffffff';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    await page.render({ canvasContext: ctx as unknown as CanvasRenderingContext2D, viewport }).promise;
-    const blob   = await canvas.convertToBlob({ type: format, quality });
+    await page.render({ canvasContext: ctx as unknown as CanvasRenderingContext2D, viewport })
+      .promise;
+    const blob = await canvas.convertToBlob({ type: format, quality });
     const buffer = await blob.arrayBuffer();
     const suffix = pagesToRender.length > 1 ? `_page${pageNum}` : '';
     return { buffer, filename: `${base}${suffix}.${ext}` };
@@ -106,15 +128,20 @@ async function pdfToImage(
 }
 
 async function pdfToText(
-  buffers: ArrayBuffer[], fileNames: string[],
-  _options: Record<string, unknown>, onProgress: ProgressFn
+  buffers: ArrayBuffer[],
+  fileNames: string[],
+  _options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
   onProgress(10);
-  const pdfDoc     = await pdfjsLib.getDocument({ data: buffers[0], CanvasFactory: OffscreenCanvasFactory } as Parameters<typeof pdfjsLib.getDocument>[0]).promise;
+  const pdfDoc = await pdfjsLib.getDocument({
+    data: buffers[0],
+    CanvasFactory: OffscreenCanvasFactory,
+  } as Parameters<typeof pdfjsLib.getDocument>[0]).promise;
   const totalPages = pdfDoc.numPages;
   const lines: string[] = [`PDF Text Extraction - ${fileNames[0]}`, ''];
   for (let i = 1; i <= totalPages; i++) {
-    const page    = await pdfDoc.getPage(i);
+    const page = await pdfDoc.getPage(i);
     const content = await page.getTextContent();
     const pageText = content.items
       .map((item) => ('str' in item ? (item as { str: string }).str : ''))
@@ -133,24 +160,29 @@ async function pdfToText(
 }
 
 async function imageToPdf(
-  buffers: ArrayBuffer[], fileNames: string[], fileMimes: string[],
-  options: Record<string, unknown>, onProgress: ProgressFn
+  buffers: ArrayBuffer[],
+  fileNames: string[],
+  fileMimes: string[],
+  options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
   const pageSize = (options.pageSize as string) || 'a4';
   const pageSizes: Record<string, [number, number]> = {
-    a4: [595.28, 841.89], letter: [612, 792],
+    a4: [595.28, 841.89],
+    letter: [612, 792],
   };
   const doc = await PDFDocument.create();
   for (let i = 0; i < buffers.length; i++) {
-    const mime   = fileMimes[i] || 'image/jpeg';
+    const mime = fileMimes[i] || 'image/jpeg';
     const bitmap = await loadBitmap(buffers[i], mime);
-    const iw = bitmap.width, ih = bitmap.height;
+    const iw = bitmap.width,
+      ih = bitmap.height;
     const canvas = new OffscreenCanvas(iw, ih);
     canvas.getContext('2d')!.drawImage(bitmap, 0, 0);
     bitmap.close();
     const pngBlob = await canvas.convertToBlob({ type: 'image/png' });
-    const pngBuf  = await pngBlob.arrayBuffer();
-    const img     = await doc.embedPng(pngBuf);
+    const pngBuf = await pngBlob.arrayBuffer();
+    const img = await doc.embedPng(pngBuf);
     let page;
     if (pageSize === 'fit') {
       page = doc.addPage([iw, ih]);
@@ -159,11 +191,23 @@ async function imageToPdf(
       const [pw, ph] = pageSizes[pageSize] ?? pageSizes.a4;
       page = doc.addPage([pw, ph]);
       const margin = 28;
-      const aw = pw - margin * 2, ah = ph - margin * 2;
+      const aw = pw - margin * 2,
+        ah = ph - margin * 2;
       const ratio = iw / ih;
       let dw: number, dh: number;
-      if (ratio > aw / ah) { dw = aw; dh = aw / ratio; } else { dh = ah; dw = ah * ratio; }
-      page.drawImage(img, { x: margin + (aw - dw) / 2, y: margin + (ah - dh) / 2, width: dw, height: dh });
+      if (ratio > aw / ah) {
+        dw = aw;
+        dh = aw / ratio;
+      } else {
+        dh = ah;
+        dw = ah * ratio;
+      }
+      page.drawImage(img, {
+        x: margin + (aw - dw) / 2,
+        y: margin + (ah - dh) / 2,
+        width: dw,
+        height: dh,
+      });
     }
     onProgress(((i + 1) / buffers.length) * 95);
   }
@@ -173,10 +217,13 @@ async function imageToPdf(
 }
 
 async function imageToBase64(
-  buffers: ArrayBuffer[], fileNames: string[], fileMimes: string[],
-  options: Record<string, unknown>, onProgress: ProgressFn
+  buffers: ArrayBuffer[],
+  fileNames: string[],
+  fileMimes: string[],
+  options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
-  const format   = (options.format as string) || 'dataurl';
+  const format = (options.format as string) || 'dataurl';
   const mimeType = fileMimes[0] || 'image/png';
   onProgress(20);
   const uint8 = new Uint8Array(buffers[0]);
@@ -187,9 +234,11 @@ async function imageToBase64(
   const b64 = btoa(binary);
   onProgress(75);
   const output =
-    format === 'css' ? `background-image: url("data:${mimeType};base64,${b64}");` :
-    format === 'raw' ? b64 :
-    `data:${mimeType};base64,${b64}`;
+    format === 'css'
+      ? `background-image: url("data:${mimeType};base64,${b64}");`
+      : format === 'raw'
+        ? b64
+        : `data:${mimeType};base64,${b64}`;
   const buffer = new TextEncoder().encode(output).buffer as ArrayBuffer;
   onProgress(100);
   const base = fileNames[0].replace(/\.[^.]+$/, '');
@@ -197,43 +246,53 @@ async function imageToBase64(
 }
 
 async function svgToPng(
-  buffers: ArrayBuffer[], fileNames: string[], _fileMimes: string[],
-  options: Record<string, unknown>, onProgress: ProgressFn
+  buffers: ArrayBuffer[],
+  fileNames: string[],
+  _fileMimes: string[],
+  options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
   const format = (options.format as string) || 'image/png';
-  const scale  = Math.max(1, Math.min(4, Number(options.scale) || 2));
+  const scale = Math.max(1, Math.min(4, Number(options.scale) || 2));
   onProgress(20);
 
   const svgText = new TextDecoder().decode(buffers[0]);
-  const blob    = new Blob([svgText], { type: 'image/svg+xml' });
+  const blob = new Blob([svgText], { type: 'image/svg+xml' });
 
   let bitmap: ImageBitmap;
   try {
     bitmap = await createImageBitmap(blob);
   } catch {
-    throw new Error('Failed to load SVG. Ensure it has valid width/height attributes and is well-formed XML.');
+    throw new Error(
+      'Failed to load SVG. Ensure it has valid width/height attributes and is well-formed XML.'
+    );
   }
 
   if (bitmap.width === 0 || bitmap.height === 0) {
     bitmap.close();
-    throw new Error('SVG has no intrinsic dimensions. Add width and height attributes to the <svg> root element.');
+    throw new Error(
+      'SVG has no intrinsic dimensions. Add width and height attributes to the <svg> root element.'
+    );
   }
 
   onProgress(50);
-  const w = Math.round(bitmap.width  * scale);
+  const w = Math.round(bitmap.width * scale);
   const h = Math.round(bitmap.height * scale);
   const canvas = new OffscreenCanvas(w, h);
-  const ctx    = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d')!;
 
-  if (format === 'image/jpeg') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, w, h); }
+  if (format === 'image/jpeg') {
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, w, h);
+  }
   ctx.drawImage(bitmap, 0, 0, w, h);
   bitmap.close();
   onProgress(80);
 
   const quality = format === 'image/png' ? 1 : 0.92;
-  const ext     = format === 'image/jpeg' ? 'jpg' : 'png';
+  const ext = format === 'image/jpeg' ? 'jpg' : 'png';
   const outBlob = await canvas.convertToBlob({ type: format, quality });
-  const buffer  = await outBlob.arrayBuffer();
+  const buffer = await outBlob.arrayBuffer();
   onProgress(100);
 
   const base = fileNames[0].replace(/\.svg$/i, '');
@@ -241,14 +300,19 @@ async function svgToPng(
 }
 
 async function createZip(
-  buffers: ArrayBuffer[], fileNames: string[],
-  options: Record<string, unknown>, onProgress: ProgressFn
+  buffers: ArrayBuffer[],
+  fileNames: string[],
+  options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
   const compression = Math.max(0, Math.min(9, Number(options.compression ?? 6)));
   const zip = new JSZip();
 
   for (let i = 0; i < buffers.length; i++) {
-    zip.file(fileNames[i], buffers[i], { compression: compression > 0 ? 'DEFLATE' : 'STORE', compressionOptions: { level: compression } });
+    zip.file(fileNames[i], buffers[i], {
+      compression: compression > 0 ? 'DEFLATE' : 'STORE',
+      compressionOptions: { level: compression },
+    });
     onProgress(((i + 1) / buffers.length) * 70);
   }
 
@@ -260,7 +324,8 @@ async function createZip(
 }
 
 async function extractZip(
-  buffers: ArrayBuffer[], fileNames: string[],
+  buffers: ArrayBuffer[],
+  fileNames: string[],
   onProgress: ProgressFn
 ): Promise<ProcessResult> {
   onProgress(10);
@@ -289,29 +354,30 @@ async function extractZip(
 }
 
 async function qrCode(
-  options: Record<string, unknown>, onProgress: ProgressFn
+  options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
-  const text       = String(options.text ?? '').trim();
+  const text = String(options.text ?? '').trim();
   const outputSize = Math.max(128, Math.min(2048, Number(options.size) || 512));
-  const ecLevel    = (options.errorLevel as 'L' | 'M' | 'Q' | 'H') || 'M';
-  const darkColor  = String(options.darkColor  || '#000000');
+  const ecLevel = (options.errorLevel as 'L' | 'M' | 'Q' | 'H') || 'M';
+  const darkColor = String(options.darkColor || '#000000');
   const lightColor = String(options.lightColor || '#ffffff');
 
   if (!text) throw new Error('Enter text or a URL to generate a QR code.');
   onProgress(10);
 
-  const matrix   = generateQR(text, ecLevel);
-  const modules  = matrix.length;
+  const matrix = generateQR(text, ecLevel);
+  const modules = matrix.length;
   onProgress(40);
 
   // Draw QR on OffscreenCanvas with quiet zone (4 modules on each side)
-  const quiet    = 4;
+  const quiet = 4;
   const totalMod = modules + quiet * 2;
-  const cellPx   = Math.max(1, Math.floor(outputSize / totalMod));
+  const cellPx = Math.max(1, Math.floor(outputSize / totalMod));
   const canvasSize = totalMod * cellPx;
 
   const canvas = new OffscreenCanvas(canvasSize, canvasSize);
-  const ctx    = canvas.getContext('2d')!;
+  const ctx = canvas.getContext('2d')!;
 
   ctx.fillStyle = lightColor;
   ctx.fillRect(0, 0, canvasSize, canvasSize);
@@ -326,7 +392,7 @@ async function qrCode(
   }
   onProgress(80);
 
-  const blob   = await canvas.convertToBlob({ type: 'image/png' });
+  const blob = await canvas.convertToBlob({ type: 'image/png' });
   const buffer = await blob.arrayBuffer();
   onProgress(100);
 
@@ -345,7 +411,7 @@ function md5(buf: ArrayBuffer): string {
   const len = data.length;
   const bitLen = len * 8;
   // Padding
-  const padLen = ((len % 64) < 56 ? 56 - (len % 64) : 120 - (len % 64));
+  const padLen = len % 64 < 56 ? 56 - (len % 64) : 120 - (len % 64);
   const msg = new Uint8Array(len + padLen + 8);
   msg.set(data);
   msg[len] = 0x80;
@@ -354,61 +420,87 @@ function md5(buf: ArrayBuffer): string {
   view.setUint32(len + padLen, bitLen & 0xffffffff, true);
   view.setUint32(len + padLen + 4, Math.floor(bitLen / 0x100000000), true);
 
-  const K = Uint32Array.from({ length: 64 }, (_, i) =>
-    Math.floor(Math.abs(Math.sin(i + 1)) * 0x100000000) >>> 0
+  const K = Uint32Array.from(
+    { length: 64 },
+    (_, i) => Math.floor(Math.abs(Math.sin(i + 1)) * 0x100000000) >>> 0
   );
   const S = [
-    7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22,
-    5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20, 5,  9, 14, 20,
-    4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23,
-    6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
+    7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 7, 12, 17, 22, 5, 9, 14, 20, 5, 9, 14, 20, 5, 9,
+    14, 20, 5, 9, 14, 20, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 4, 11, 16, 23, 6, 10, 15, 21,
+    6, 10, 15, 21, 6, 10, 15, 21, 6, 10, 15, 21,
   ];
 
-  let a0 = 0x67452301, b0 = 0xefcdab89, c0 = 0x98badcfe, d0 = 0x10325476;
+  let a0 = 0x67452301,
+    b0 = 0xefcdab89,
+    c0 = 0x98badcfe,
+    d0 = 0x10325476;
   const msgView = new DataView(msg.buffer);
 
   for (let i = 0; i < msg.length; i += 64) {
     const M = Array.from({ length: 16 }, (_, j) => msgView.getUint32(i + j * 4, true));
-    let A = a0, B = b0, C = c0, D = d0;
+    let A = a0,
+      B = b0,
+      C = c0,
+      D = d0;
     for (let j = 0; j < 64; j++) {
       let F: number, g: number;
-      if (j < 16)      { F = (B & C) | (~B & D); g = j; }
-      else if (j < 32) { F = (D & B) | (~D & C); g = (5 * j + 1) % 16; }
-      else if (j < 48) { F = B ^ C ^ D;           g = (3 * j + 5) % 16; }
-      else             { F = C ^ (B | ~D);         g = (7 * j) % 16; }
+      if (j < 16) {
+        F = (B & C) | (~B & D);
+        g = j;
+      } else if (j < 32) {
+        F = (D & B) | (~D & C);
+        g = (5 * j + 1) % 16;
+      } else if (j < 48) {
+        F = B ^ C ^ D;
+        g = (3 * j + 5) % 16;
+      } else {
+        F = C ^ (B | ~D);
+        g = (7 * j) % 16;
+      }
       F = (F + A + K[j] + M[g]) >>> 0;
-      A = D; D = C; C = B;
+      A = D;
+      D = C;
+      C = B;
       const s = S[j];
       B = (B + ((F << s) | (F >>> (32 - s)))) >>> 0;
     }
-    a0 = (a0 + A) >>> 0; b0 = (b0 + B) >>> 0;
-    c0 = (c0 + C) >>> 0; d0 = (d0 + D) >>> 0;
+    a0 = (a0 + A) >>> 0;
+    b0 = (b0 + B) >>> 0;
+    c0 = (c0 + C) >>> 0;
+    d0 = (d0 + D) >>> 0;
   }
 
   const toLE = (n: number) => {
     const b = [];
-    for (let i = 0; i < 4; i++) { b.push((n >>> (i * 8)) & 0xff); }
+    for (let i = 0; i < 4; i++) {
+      b.push((n >>> (i * 8)) & 0xff);
+    }
     return b;
   };
   return [...toLE(a0), ...toLE(b0), ...toLE(c0), ...toLE(d0)]
-    .map((b) => b.toString(16).padStart(2, '0')).join('');
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 async function sha(algo: AlgorithmIdentifier, buf: ArrayBuffer): Promise<string> {
   const digest = await crypto.subtle.digest(algo, buf);
-  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 }
 
 async function fileHash(
-  buffers: ArrayBuffer[], fileNames: string[],
-  options: Record<string, unknown>, onProgress: ProgressFn
+  buffers: ArrayBuffer[],
+  fileNames: string[],
+  options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
   const algo = String(options.algorithm || 'SHA-256');
   const lines: string[] = [];
 
   const step = 100 / buffers.length;
   for (let i = 0; i < buffers.length; i++) {
-    const buf  = buffers[i];
+    const buf = buffers[i];
     const name = fileNames[i];
     lines.push(`File: ${name}`);
 
@@ -429,9 +521,7 @@ async function fileHash(
   const text = lines.join('\n').trim();
   const encoder = new TextEncoder();
   const buffer = encoder.encode(text).buffer as ArrayBuffer;
-  const outName = buffers.length === 1
-    ? `${fileNames[0]}.hash.txt`
-    : 'file_hashes.txt';
+  const outName = buffers.length === 1 ? `${fileNames[0]}.hash.txt` : 'file_hashes.txt';
   return { buffer, filename: outName, mime: 'text/plain' };
 }
 
@@ -442,26 +532,27 @@ async function fileHash(
    ============================================================ */
 
 const PAGE_SIZES: Record<string, [number, number]> = {
-  a4:     [595.28, 841.89],
-  letter: [612,    792],
-  a3:     [841.89, 1190.55],
+  a4: [595.28, 841.89],
+  letter: [612, 792],
+  a3: [841.89, 1190.55],
 };
 
 async function textToPdf(
-  buffers: ArrayBuffer[], fileNames: string[],
-  options: Record<string, unknown>, onProgress: ProgressFn
+  buffers: ArrayBuffer[],
+  fileNames: string[],
+  options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
   const pageSizeKey = String(options.pageSize || 'a4');
   const [pageW, pageH] = PAGE_SIZES[pageSizeKey] ?? PAGE_SIZES.a4;
-  const fontSize    = Math.max(6, Math.min(36, Number(options.fontSize) || 11));
-  const marginMm    = Math.max(5, Math.min(50, Number(options.marginMm) || 20));
+  const fontSize = Math.max(6, Math.min(36, Number(options.fontSize) || 11));
+  const marginMm = Math.max(5, Math.min(50, Number(options.marginMm) || 20));
   const lineHeightMul = Math.max(1, Number(options.lineHeight) || 1.5);
 
   const MM_TO_PT = 2.8346;
   const margin = marginMm * MM_TO_PT;
-  const lineH  = fontSize * lineHeightMul;
+  const lineH = fontSize * lineHeightMul;
   const usableW = pageW - margin * 2;
-  const usableH = pageH - margin * 2;
 
   // Read source text
   const decoder = new TextDecoder('utf-8', { fatal: false });
@@ -469,11 +560,11 @@ async function textToPdf(
 
   onProgress(10);
 
-  const doc  = await PDFDocument.create();
+  const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Courier);
 
   // Measure character width at given size (Courier is monospace: all chars same width)
-  const charW  = font.widthOfTextAtSize('M', fontSize);
+  const charW = font.widthOfTextAtSize('M', fontSize);
   const charsPerLine = Math.max(1, Math.floor(usableW / charW));
 
   // Word-wrap: split long lines, keep short ones
@@ -522,7 +613,11 @@ async function textToPdf(
 
   const pdfBytes = await doc.save();
   const baseName = fileNames[0].replace(/\.[^.]+$/, '');
-  return { buffer: pdfBytes.buffer as ArrayBuffer, filename: `${baseName}.pdf`, mime: 'application/pdf' };
+  return {
+    buffer: pdfBytes.buffer as ArrayBuffer,
+    filename: `${baseName}.pdf`,
+    mime: 'application/pdf',
+  };
 }
 
 /* ============================================================
@@ -534,13 +629,16 @@ async function textToPdf(
 
 const SIZE_SETS: Record<string, number[]> = {
   standard: [16, 32, 48, 64, 128, 180, 192, 512],
-  minimal:  [16, 32, 192, 512],
-  apple:    [57, 60, 72, 76, 114, 120, 144, 152, 180],
+  minimal: [16, 32, 192, 512],
+  apple: [57, 60, 72, 76, 114, 120, 144, 152, 180],
 };
 
 async function faviconGenerator(
-  buffers: ArrayBuffer[], fileNames: string[], fileMimes: string[],
-  options: Record<string, unknown>, onProgress: ProgressFn
+  buffers: ArrayBuffer[],
+  fileNames: string[],
+  fileMimes: string[],
+  options: Record<string, unknown>,
+  onProgress: ProgressFn
 ): Promise<ProcessResult> {
   const fmt = String(options.format || 'png') === 'webp' ? 'image/webp' : 'image/png';
   const ext = fmt === 'image/webp' ? 'webp' : 'png';
@@ -563,14 +661,16 @@ async function faviconGenerator(
     const ctx = canvas.getContext('2d')!;
     ctx.drawImage(bitmap, 0, 0, size, size);
     const blob = await canvas.convertToBlob({ type: fmt, quality: 0.95 });
-    const buf  = await blob.arrayBuffer();
+    const buf = await blob.arrayBuffer();
 
     const fileName = `favicon-${size}x${size}.${ext}`;
     zip.file(fileName, buf);
 
     // Generate appropriate <link> tags
     if (size === 16 || size === 32 || size === 48) {
-      linkTags.push(`<link rel="icon" type="image/${ext}" sizes="${size}x${size}" href="${fileName}">`);
+      linkTags.push(
+        `<link rel="icon" type="image/${ext}" sizes="${size}x${size}" href="${fileName}">`
+      );
     } else if (size === 180) {
       linkTags.push(`<link rel="apple-touch-icon" sizes="${size}x${size}" href="${fileName}">`);
     } else if (size === 192 || size === 512) {

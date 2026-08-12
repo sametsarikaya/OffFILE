@@ -22,8 +22,8 @@ const colorPalette: Tool = {
       label: 'Number of Colors',
       type: 'select',
       options: [
-        { value: '5',  label: '5 colors' },
-        { value: '8',  label: '8 colors' },
+        { value: '5', label: '5 colors' },
+        { value: '8', label: '8 colors' },
         { value: '12', label: '12 colors' },
       ],
       defaultValue: '8',

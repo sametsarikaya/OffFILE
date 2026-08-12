@@ -19,7 +19,9 @@ export function createNavbar(options: NavbarOptions = {}): HTMLElement {
   const hash = window.location.hash || '#/';
   const currentToolId = hash.startsWith('#/tool/') ? hash.replace('#/tool/', '') : null;
   const activeCategoryId = currentToolId
-    ? categories.find((cat) => getToolsByCategory(cat.id).some((tool) => tool.id === currentToolId))?.id ?? null
+    ? (categories.find((cat) =>
+        getToolsByCategory(cat.id).some((tool) => tool.id === currentToolId)
+      )?.id ?? null)
     : null;
 
   nav.innerHTML = `
@@ -37,9 +39,10 @@ export function createNavbar(options: NavbarOptions = {}): HTMLElement {
 
       <!-- Nav Links -->
       <div class="navbar__nav" id="nav-links">
-        ${categories.map((cat) => {
-          const tools = getToolsByCategory(cat.id);
-          return `
+        ${categories
+          .map((cat) => {
+            const tools = getToolsByCategory(cat.id);
+            return `
           <div class="navbar__dropdown ${activeCategoryId === cat.id ? 'is-active' : ''}" data-cat="${cat.id}">
             <button class="navbar__nav-btn" type="button" aria-haspopup="true" aria-expanded="false">
               ${cat.short} TOOLS
@@ -49,18 +52,23 @@ export function createNavbar(options: NavbarOptions = {}): HTMLElement {
             </button>
             <div class="navbar__dropdown-menu">
               <div class="navbar__dropdown-grid">
-                ${tools.map((t) => `
+                ${tools
+                  .map(
+                    (t) => `
                   <a class="navbar__dropdown-item" href="#/tool/${t.id}">
                     <span class="navbar__dropdown-item-icon" style="background:${t.color}20; color:${t.color}">
                       ${t.icon}
                     </span>
                     <span class="navbar__dropdown-item-text">${t.title}</span>
                   </a>
-                `).join('')}
+                `
+                  )
+                  .join('')}
               </div>
             </div>
           </div>`;
-        }).join('')}
+          })
+          .join('')}
       </div>
 
       <div class="navbar__search" role="search">
@@ -165,9 +173,14 @@ export function createNavbar(options: NavbarOptions = {}): HTMLElement {
       btn.setAttribute('aria-expanded', 'false');
     };
 
-    dd.addEventListener('mouseenter', () => { clearTimeout(closeTimer); open(); });
-    dd.addEventListener('mouseleave', () => { closeTimer = setTimeout(close, 150); });
-    btn.addEventListener('click', () => dd.classList.contains('is-open') ? close() : open());
+    dd.addEventListener('mouseenter', () => {
+      clearTimeout(closeTimer);
+      open();
+    });
+    dd.addEventListener('mouseleave', () => {
+      closeTimer = setTimeout(close, 150);
+    });
+    btn.addEventListener('click', () => (dd.classList.contains('is-open') ? close() : open()));
   });
 
   // Close dropdown when clicking a link

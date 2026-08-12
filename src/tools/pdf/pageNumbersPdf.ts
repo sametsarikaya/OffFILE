@@ -62,10 +62,8 @@ const pageNumbersPdf: Tool = {
       const page = pages[i];
       const { width } = page.getSize();
 
-      let label = '';
-      if (format === 'of') label = `${i + 1} of ${total}`;
-      else if (format === 'dash') label = `- ${i + 1} -`;
-      else label = `${i + 1}`;
+      const label =
+        format === 'of' ? `${i + 1} of ${total}` : format === 'dash' ? `- ${i + 1} -` : `${i + 1}`;
 
       const textWidth = font.widthOfTextAtSize(label, fontSize);
       let x = margin;

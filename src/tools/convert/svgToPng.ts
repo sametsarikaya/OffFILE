@@ -3,7 +3,8 @@ import type { Tool } from '../../types';
 const svgToPng: Tool = {
   id: 'svg-to-png',
   title: 'SVG to PNG/JPG',
-  description: 'Convert SVG vector files to raster PNG or JPEG images. SVG must have width/height attributes.',
+  description:
+    'Convert SVG vector files to raster PNG or JPEG images. SVG must have width/height attributes.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="10"/>
     <path d="M8 12h8M12 8l4 4-4 4"/>
@@ -18,7 +19,7 @@ const svgToPng: Tool = {
       label: 'Output Format',
       type: 'select',
       options: [
-        { value: 'image/png',  label: 'PNG (transparent background)' },
+        { value: 'image/png', label: 'PNG (transparent background)' },
         { value: 'image/jpeg', label: 'JPEG (white background)' },
       ],
       defaultValue: 'image/png',

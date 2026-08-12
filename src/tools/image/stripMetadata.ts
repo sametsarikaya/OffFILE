@@ -27,7 +27,8 @@ async function readImageInfo(file: File): Promise<{
           bytes[3] === 0xe1;
         resolve({ width: img.naturalWidth, height: img.naturalHeight, hasExifMarker });
       };
-      reader.onerror = () => resolve({ width: img.naturalWidth, height: img.naturalHeight, hasExifMarker: false });
+      reader.onerror = () =>
+        resolve({ width: img.naturalWidth, height: img.naturalHeight, hasExifMarker: false });
       reader.readAsArrayBuffer(file.slice(0, 16));
     };
     img.onerror = () => {
@@ -47,7 +48,8 @@ function formatBytes(bytes: number): string {
 const stripMetadata: Tool = {
   id: 'strip-metadata',
   title: 'Strip Metadata',
-  description: 'Remove EXIF data, GPS location, and other metadata from images. Preview what will be removed first.',
+  description:
+    'Remove EXIF data, GPS location, and other metadata from images. Preview what will be removed first.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="3" y="3" width="18" height="18" rx="2"/>
     <circle cx="8.5" cy="8.5" r="1.5"/>
@@ -75,23 +77,31 @@ const stripMetadata: Tool = {
     const info = await readImageInfo(file);
     loading.remove();
 
-    const ext    = file.name.split('.').pop()?.toUpperCase() || '?';
-    const mime   = file.type || `image/${ext.toLowerCase()}`;
+    const ext = file.name.split('.').pop()?.toUpperCase() || '?';
+    const mime = file.type || `image/${ext.toLowerCase()}`;
     const isJpeg = mime === 'image/jpeg' || mime === 'image/jpg';
     const modDate = new Date(file.lastModified).toLocaleString();
 
     // Metadata fields table
     const rows: [string, string, boolean][] = [
-      ['File Name',      escapeHtml(file.name),                             false],
-      ['File Size',      formatBytes(file.size),                            false],
-      ['Dimensions',     info.width > 0 ? `${info.width} × ${info.height} px` : 'Unknown', false],
-      ['Format',         mime,                                              false],
-      ['Last Modified',  modDate,                                           false],
-      ['EXIF / APP1',    isJpeg ? (info.hasExifMarker ? 'Detected ✓' : 'Not found') : 'N/A (non-JPEG)', isJpeg && info.hasExifMarker],
-      ['GPS Location',   isJpeg && info.hasExifMarker ? 'May be embedded — will be removed' : 'N/A', isJpeg && info.hasExifMarker],
-      ['Camera / Device','May be embedded — will be removed',               isJpeg && info.hasExifMarker],
-      ['Color Profile',  'Re-encoded on canvas (ICC stripped)',             true],
-      ['Timestamps',     'EXIF timestamps stripped',                        isJpeg && info.hasExifMarker],
+      ['File Name', escapeHtml(file.name), false],
+      ['File Size', formatBytes(file.size), false],
+      ['Dimensions', info.width > 0 ? `${info.width} × ${info.height} px` : 'Unknown', false],
+      ['Format', mime, false],
+      ['Last Modified', modDate, false],
+      [
+        'EXIF / APP1',
+        isJpeg ? (info.hasExifMarker ? 'Detected ✓' : 'Not found') : 'N/A (non-JPEG)',
+        isJpeg && info.hasExifMarker,
+      ],
+      [
+        'GPS Location',
+        isJpeg && info.hasExifMarker ? 'May be embedded — will be removed' : 'N/A',
+        isJpeg && info.hasExifMarker,
+      ],
+      ['Camera / Device', 'May be embedded — will be removed', isJpeg && info.hasExifMarker],
+      ['Color Profile', 'Re-encoded on canvas (ICC stripped)', true],
+      ['Timestamps', 'EXIF timestamps stripped', isJpeg && info.hasExifMarker],
     ];
 
     wrap.innerHTML = `
@@ -108,13 +118,17 @@ const stripMetadata: Tool = {
           </tr>
         </thead>
         <tbody>
-          ${rows.map(([label, value, willChange]) => `
+          ${rows
+            .map(
+              ([label, value, willChange]) => `
             <tr class="${willChange ? 'metadata-panel__row--changed' : ''}">
               <td>${escapeHtml(label)}</td>
               <td>${escapeHtml(value)}</td>
               <td>${willChange ? '<span class="metadata-tag">Removed</span>' : '<span class="metadata-ok">Kept</span>'}</td>
             </tr>
-          `).join('')}
+          `
+            )
+            .join('')}
         </tbody>
       </table>
       <p class="metadata-panel__note">

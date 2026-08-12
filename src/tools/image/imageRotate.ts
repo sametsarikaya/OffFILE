@@ -64,7 +64,10 @@ const imageRotate: Tool = {
 function loadImage(file: File): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.onload = () => { URL.revokeObjectURL(img.src); resolve(img); };
+    img.onload = () => {
+      URL.revokeObjectURL(img.src);
+      resolve(img);
+    };
     img.onerror = () => reject(new Error('Failed to load image.'));
     img.src = URL.createObjectURL(file);
   });
@@ -72,10 +75,7 @@ function loadImage(file: File): Promise<HTMLImageElement> {
 
 function canvasToBlob(canvas: HTMLCanvasElement, type: string): Promise<Blob> {
   return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error('Rotation failed.'))),
-      type, 0.92
-    );
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Rotation failed.'))), type, 0.92);
   });
 }
 

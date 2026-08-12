@@ -31,9 +31,7 @@ function createSizeWarning(fileNames: string[], limitBytes: number): HTMLElement
   return bar;
 }
 
-function checkSizeWarning(
-  files: File[], maxWarnBytes: number, container: HTMLElement
-): void {
+function checkSizeWarning(files: File[], maxWarnBytes: number, container: HTMLElement): void {
   const oversized = files.filter((f) => f.size > maxWarnBytes).map((f) => f.name);
   if (!oversized.length) return;
   const existing = container.querySelector('#size-warning');
@@ -52,7 +50,10 @@ export function createDropZone(config: DropZoneConfig): HTMLElement {
   zone.setAttribute('role', 'button');
   zone.setAttribute('aria-label', 'Upload file - drag and drop or click to browse');
 
-  const accepts = acceptedTypes.split(',').map((s) => s.trim()).join(', ');
+  const accepts = acceptedTypes
+    .split(',')
+    .map((s) => s.trim())
+    .join(', ');
 
   zone.innerHTML = `
     <div class="dropzone__body">
@@ -75,13 +76,13 @@ export function createDropZone(config: DropZoneConfig): HTMLElement {
     </div>
   `;
 
-  const input     = zone.querySelector('#dz-file-input')   as HTMLInputElement;
-  const browseBtn = zone.querySelector('#dz-browse-btn')   as HTMLButtonElement;
-  const overlay   = zone.querySelector('#dz-overlay')      as HTMLElement;
+  const input = zone.querySelector('#dz-file-input') as HTMLInputElement;
+  const browseBtn = zone.querySelector('#dz-browse-btn') as HTMLButtonElement;
+  const overlay = zone.querySelector('#dz-overlay') as HTMLElement;
 
   /** Filter files by MIME type, show notification for rejected ones */
   function filterAndDeliver(raw: File[]): void {
-    const allowed  = raw.filter((f) => isFileTypeAllowed(f, acceptedTypes));
+    const allowed = raw.filter((f) => isFileTypeAllowed(f, acceptedTypes));
     const rejected = raw.length - allowed.length;
 
     if (rejected > 0) {
@@ -99,20 +100,30 @@ export function createDropZone(config: DropZoneConfig): HTMLElement {
 
   browseBtn.addEventListener('click', () => input.click());
   zone.addEventListener('keydown', (e: KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      input.click();
+    }
   });
 
   // Mobile touch: tap on the zone itself opens the file picker
   // (drag-and-drop is not available on mobile browsers)
-  zone.addEventListener('touchend', (e: TouchEvent) => {
-    // Only respond to a simple tap (not a scroll or multi-touch)
-    if (e.changedTouches.length === 1 && e.target !== browseBtn) {
-      e.preventDefault();
-      input.click();
-    }
-  }, { passive: false });
+  zone.addEventListener(
+    'touchend',
+    (e: TouchEvent) => {
+      // Only respond to a simple tap (not a scroll or multi-touch)
+      if (e.changedTouches.length === 1 && e.target !== browseBtn) {
+        e.preventDefault();
+        input.click();
+      }
+    },
+    { passive: false }
+  );
   input.addEventListener('change', () => {
-    if (input.files?.length) { filterAndDeliver(Array.from(input.files)); input.value = ''; }
+    if (input.files?.length) {
+      filterAndDeliver(Array.from(input.files));
+      input.value = '';
+    }
   });
 
   // Page-level drag overlay
@@ -133,8 +144,10 @@ export function createDropZone(config: DropZoneConfig): HTMLElement {
       overlay.style.display = 'none';
     }
   };
-  const onDragOver = (e: DragEvent) => { e.preventDefault(); };
-  const onDrop     = (e: DragEvent) => {
+  const onDragOver = (e: DragEvent) => {
+    e.preventDefault();
+  };
+  const onDrop = (e: DragEvent) => {
     e.preventDefault();
     dragCounter = 0;
     zone.classList.remove('dropzone--active');
@@ -146,15 +159,19 @@ export function createDropZone(config: DropZoneConfig): HTMLElement {
 
   document.addEventListener('dragenter', onDragEnter);
   document.addEventListener('dragleave', onDragLeave);
-  document.addEventListener('dragover',  onDragOver);
-  document.addEventListener('drop',      onDrop);
+  document.addEventListener('dragover', onDragOver);
+  document.addEventListener('drop', onDrop);
 
-  window.addEventListener('hashchange', () => {
-    document.removeEventListener('dragenter', onDragEnter);
-    document.removeEventListener('dragleave', onDragLeave);
-    document.removeEventListener('dragover',  onDragOver);
-    document.removeEventListener('drop',      onDrop);
-  }, { once: true });
+  window.addEventListener(
+    'hashchange',
+    () => {
+      document.removeEventListener('dragenter', onDragEnter);
+      document.removeEventListener('dragleave', onDragLeave);
+      document.removeEventListener('dragover', onDragOver);
+      document.removeEventListener('drop', onDrop);
+    },
+    { once: true }
+  );
 
   return zone;
 }
@@ -196,7 +213,7 @@ export function createFileList(
       item.setAttribute('draggable', orderedFiles.length > 1 ? 'true' : 'false');
       item.dataset.index = String(index);
 
-      const ext     = escapeHtml(file.name.split('.').pop()?.toUpperCase() || '?');
+      const ext = escapeHtml(file.name.split('.').pop()?.toUpperCase() || '?');
       const safeName = escapeHtml(file.name);
       item.innerHTML = `
         <div class="file-list__item-drag" aria-hidden="true">
@@ -231,12 +248,16 @@ export function createFileList(
         });
         item.addEventListener('dragend', () => {
           item.classList.remove('is-dragging');
-          list.querySelectorAll('.file-list__item').forEach((el) => el.classList.remove('drag-over'));
+          list
+            .querySelectorAll('.file-list__item')
+            .forEach((el) => el.classList.remove('drag-over'));
         });
         item.addEventListener('dragover', (e) => {
           e.preventDefault();
           e.dataTransfer!.dropEffect = 'move';
-          list.querySelectorAll('.file-list__item').forEach((el) => el.classList.remove('drag-over'));
+          list
+            .querySelectorAll('.file-list__item')
+            .forEach((el) => el.classList.remove('drag-over'));
           item.classList.add('drag-over');
         });
         item.addEventListener('drop', (e) => {

@@ -42,7 +42,8 @@ export default defineConfig({
       manifest: {
         name: 'OffFile - Privacy-First File Tools',
         short_name: 'OffFile',
-        description: 'Browser-based file tools. Merge PDFs, convert images - 100% offline, no uploads.',
+        description:
+          'Browser-based file tools. Merge PDFs, convert images - 100% offline, no uploads.',
         theme_color: '#ffe600',
         background_color: '#f5f0de',
         display: 'standalone',

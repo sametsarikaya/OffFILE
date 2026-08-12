@@ -25,7 +25,7 @@ const imageConvert: Tool = {
       label: 'Target Format',
       type: 'select',
       options: [
-        { value: 'image/png',  label: 'PNG' },
+        { value: 'image/png', label: 'PNG' },
         { value: 'image/jpeg', label: 'JPEG' },
         { value: 'image/webp', label: 'WebP' },
       ],

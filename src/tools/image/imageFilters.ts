@@ -3,7 +3,8 @@ import type { Tool } from '../../types';
 const imageFilters: Tool = {
   id: 'image-filters',
   title: 'Image Filters',
-  description: 'Apply visual filters like grayscale, sepia, invert, and blur with adjustable intensity.',
+  description:
+    'Apply visual filters like grayscale, sepia, invert, and blur with adjustable intensity.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="2" y="2" width="20" height="13" rx="2"/>
     <circle cx="7" cy="7.5" r="1.5"/>
@@ -22,13 +23,13 @@ const imageFilters: Tool = {
       label: 'Filter type',
       type: 'select',
       options: [
-        { value: 'grayscale',  label: 'Grayscale' },
-        { value: 'sepia',      label: 'Sepia' },
-        { value: 'invert',     label: 'Invert Colors' },
+        { value: 'grayscale', label: 'Grayscale' },
+        { value: 'sepia', label: 'Sepia' },
+        { value: 'invert', label: 'Invert Colors' },
         { value: 'brightness', label: 'Brighten' },
-        { value: 'contrast',   label: 'High Contrast' },
-        { value: 'blur',       label: 'Blur' },
-        { value: 'saturate',   label: 'Saturate' },
+        { value: 'contrast', label: 'High Contrast' },
+        { value: 'blur', label: 'Blur' },
+        { value: 'saturate', label: 'Saturate' },
       ],
       defaultValue: 'grayscale',
     },

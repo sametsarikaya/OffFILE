@@ -3,7 +3,8 @@ import type { Tool } from '../../types';
 const fileHash: Tool = {
   id: 'file-hash',
   title: 'File Hash',
-  description: 'Compute SHA-256, SHA-1, SHA-512 and MD5 checksums. 100% offline — no file leaves your browser.',
+  description:
+    'Compute SHA-256, SHA-1, SHA-512 and MD5 checksums. 100% offline — no file leaves your browser.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <line x1="4" y1="9" x2="20" y2="9"/>
     <line x1="4" y1="15" x2="20" y2="15"/>

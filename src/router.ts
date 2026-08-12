@@ -3,7 +3,11 @@ import { createToolGrid } from './components/toolGrid';
 import { createDropZone, createFileList } from './components/dropZone';
 import { showProcessing, showDownload, showError } from './components/processingUI';
 import { createOptionsPanel } from './components/optionsPanel';
-import { showShortcutsModal, hideShortcutsModal, isShortcutsModalOpen } from './components/shortcutsModal';
+import {
+  showShortcutsModal,
+  hideShortcutsModal,
+  isShortcutsModalOpen,
+} from './components/shortcutsModal';
 import { getAllTools, getToolById, getToolsByCategory, categories } from './tools/registry';
 import { runTool, runToolBatch, cancelCurrentTool } from './worker/workerClient';
 import { escapeHtml } from './utils/escapeHtml';
@@ -16,11 +20,7 @@ const app = document.getElementById('app')!;
 let hasRenderedRoute = false;
 let routeTransitionTimer: number | undefined;
 
-const comparisonToolIds = new Set([
-  'compress-pdf',
-  'image-compress',
-  'strip-metadata',
-]);
+const comparisonToolIds = new Set(['compress-pdf', 'image-compress', 'strip-metadata']);
 
 export function initRouter(): void {
   window.addEventListener('hashchange', handleRoute);
@@ -109,9 +109,7 @@ function renderHome(): void {
     const favIds = getFavoriteIds();
     if (favIds.length === 0) return;
 
-    const favTools = favIds
-      .map((id) => getToolById(id))
-      .filter((t): t is Tool => t !== undefined);
+    const favTools = favIds.map((id) => getToolById(id)).filter((t): t is Tool => t !== undefined);
     if (favTools.length === 0) return;
 
     const section = document.createElement('section');
@@ -134,11 +132,13 @@ function renderHome(): void {
   // Sync star button visual state across all cards on the page for a given tool id.
   const syncStarButtons = (toolId: string) => {
     const starred = isFavorite(toolId);
-    container.querySelectorAll<HTMLButtonElement>(`.tool-card__star[data-tool-id="${toolId}"]`).forEach((btn) => {
-      btn.classList.toggle('is-starred', starred);
-      btn.setAttribute('aria-pressed', String(starred));
-      btn.setAttribute('aria-label', starred ? 'Remove from favorites' : 'Add to favorites');
-    });
+    container
+      .querySelectorAll<HTMLButtonElement>(`.tool-card__star[data-tool-id="${toolId}"]`)
+      .forEach((btn) => {
+        btn.classList.toggle('is-starred', starred);
+        btn.setAttribute('aria-pressed', String(starred));
+        btn.setAttribute('aria-label', starred ? 'Remove from favorites' : 'Add to favorites');
+      });
   };
 
   renderFavoritesSection();
@@ -288,7 +288,9 @@ function renderHome(): void {
     if (!q) {
       favoritesSlot.style.display = '';
       recentSlot.style.display = '';
-      allCatSections.forEach((s) => { s.style.display = ''; });
+      allCatSections.forEach((s) => {
+        s.style.display = '';
+      });
       if ((window.location.hash || '#/') !== '#/') {
         window.history.replaceState(null, '', '#/');
       }
@@ -301,7 +303,9 @@ function renderHome(): void {
 
     favoritesSlot.style.display = 'none';
     recentSlot.style.display = 'none';
-    allCatSections.forEach((s) => { s.style.display = 'none'; });
+    allCatSections.forEach((s) => {
+      s.style.display = 'none';
+    });
 
     const matched = getAllTools().filter(
       (t) => t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q)
@@ -312,9 +316,10 @@ function renderHome(): void {
 
     const heading = document.createElement('h2');
     heading.className = 'category-section__title';
-    heading.textContent = matched.length > 0
-      ? `${matched.length} result(s) for "${trimmedQuery}"`
-      : `No results found for "${trimmedQuery}"`;
+    heading.textContent =
+      matched.length > 0
+        ? `${matched.length} result(s) for "${trimmedQuery}"`
+        : `No results found for "${trimmedQuery}"`;
     searchResultSection.appendChild(heading);
 
     if (matched.length > 0) {
@@ -346,7 +351,9 @@ function renderHome(): void {
     }
   };
   document.addEventListener('keydown', onHomeKey);
-  window.addEventListener('hashchange', () => document.removeEventListener('keydown', onHomeKey), { once: true });
+  window.addEventListener('hashchange', () => document.removeEventListener('keydown', onHomeKey), {
+    once: true,
+  });
 }
 
 function renderToolPage(toolId: string): void {
@@ -438,7 +445,8 @@ function renderToolPage(toolId: string): void {
       }
     } else if (e.key === '?' && !isInputFocused()) {
       e.preventDefault();
-      isShortcutsModalOpen() ? hideShortcutsModal() : showShortcutsModal();
+      if (isShortcutsModalOpen()) hideShortcutsModal();
+      else showShortcutsModal();
     } else if (e.key === 'Enter' && !isInputFocused()) {
       const processBtn = document.getElementById('process-btn') as HTMLButtonElement | null;
       processBtn?.click();
@@ -449,7 +457,9 @@ function renderToolPage(toolId: string): void {
     }
   };
   document.addEventListener('keydown', onKeyDown);
-  window.addEventListener('hashchange', () => document.removeEventListener('keydown', onKeyDown), { once: true });
+  window.addEventListener('hashchange', () => document.removeEventListener('keydown', onKeyDown), {
+    once: true,
+  });
 
   renderDropState(tool, workArea);
 }
@@ -491,9 +501,7 @@ function renderDropState(tool: Tool, workArea: HTMLElement): void {
     color: tool.color,
     maxWarnBytes: tool.maxWarnBytes,
     onFiles: (files) => {
-      selectedFiles = tool.multiple
-        ? [...selectedFiles, ...files]
-        : [files[0]];
+      selectedFiles = tool.multiple ? [...selectedFiles, ...files] : [files[0]];
       renderFilesSelected(tool, workArea);
     },
   });
@@ -550,7 +558,11 @@ function buildFileList(tool: Tool, workArea: HTMLElement): HTMLElement {
         renderFilesSelected(tool, workArea);
       }
     },
-    tool.multiple ? (reordered) => { selectedFiles = reordered; } : undefined
+    tool.multiple
+      ? (reordered) => {
+          selectedFiles = reordered;
+        }
+      : undefined
   );
 }
 
@@ -592,7 +604,8 @@ function mountOptionsPanel(
     processBtn.disabled = true;
     processBtn.innerHTML = `<span class="process-btn__spinner" aria-hidden="true"></span> Loading...`;
 
-    tool.renderInteractivePanel(selectedFiles, currentOptions)
+    tool
+      .renderInteractivePanel(selectedFiles, currentOptions)
       .then((el) => {
         const btnRowEl = workArea.querySelector('.process-btn-row');
         if (btnRowEl) workArea.insertBefore(el, btnRowEl);
@@ -653,7 +666,10 @@ async function runProcess(tool: Tool, workArea: HTMLElement): Promise<void> {
         renderDropState(tool, workArea);
       }).catch((err) => {
         const message = err instanceof Error ? err.message : 'Could not render palette.';
-        showError(workArea, message, { onRetry: () => renderFilesSelected(tool, workArea), onRestart: () => renderDropState(tool, workArea) });
+        showError(workArea, message, {
+          onRetry: () => renderFilesSelected(tool, workArea),
+          onRestart: () => renderDropState(tool, workArea),
+        });
       });
       return;
     }
@@ -703,12 +719,18 @@ async function runBatchProcess(tool: Tool, workArea: HTMLElement): Promise<void>
 
   try {
     await delay(300);
-    const results = await runToolBatch(tool.id, files, options, (percent) => {
-      updateProgress(percent);
-    }, (done, tot) => {
-      if (done < tot) updateStatus(`Processing file ${done + 1} of ${tot}...`);
-      else updateStatus('Packaging results...');
-    });
+    const results = await runToolBatch(
+      tool.id,
+      files,
+      options,
+      (percent) => {
+        updateProgress(percent);
+      },
+      (done, tot) => {
+        if (done < tot) updateStatus(`Processing file ${done + 1} of ${tot}...`);
+        else updateStatus('Packaging results...');
+      }
+    );
 
     if (cancelled) return;
 
@@ -856,8 +878,8 @@ async function showColorPaletteResult(
   grid.className = 'palette-result__grid';
 
   data.colors.forEach(({ hex, r, g, b }) => {
-    const luma  = 0.299 * r + 0.587 * g + 0.114 * b;
-    const text  = luma > 140 ? '#111111' : '#FFFFFF';
+    const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+    const text = luma > 140 ? '#111111' : '#FFFFFF';
 
     const swatch = document.createElement('button');
     swatch.type = 'button';
@@ -879,8 +901,12 @@ async function showColorPaletteResult(
         const info = swatch.querySelector('.palette-swatch__hex') as HTMLElement;
         const prev = info.textContent;
         info.textContent = 'Copied!';
-        setTimeout(() => { info.textContent = prev; }, 1200);
-      } catch { /* clipboard denied */ }
+        setTimeout(() => {
+          info.textContent = prev;
+        }, 1200);
+      } catch {
+        /* clipboard denied */
+      }
     });
 
     grid.appendChild(swatch);
@@ -905,14 +931,12 @@ async function showColorPaletteResult(
     Download as CSS Variables
   `;
   downloadBtn.addEventListener('click', () => {
-    const cssVars = data.colors
-      .map((c, i) => `  --color-${i + 1}: ${c.hex};`)
-      .join('\n');
-    const css  = `:root {\n${cssVars}\n}\n`;
+    const cssVars = data.colors.map((c, i) => `  --color-${i + 1}: ${c.hex};`).join('\n');
+    const css = `:root {\n${cssVars}\n}\n`;
     const blob = new Blob([css], { type: 'text/css' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
     a.download = 'palette.css';
     a.click();
     URL.revokeObjectURL(url);
@@ -933,12 +957,15 @@ async function showColorPaletteResult(
   `;
   pngBtn.addEventListener('click', () => {
     const colors = data.colors;
-    const cols   = Math.min(colors.length, 5);
-    const rows   = Math.ceil(colors.length / cols);
-    const swW = 160, swH = 128, pad = 12, titleH = 48;
+    const cols = Math.min(colors.length, 5);
+    const rows = Math.ceil(colors.length / cols);
+    const swW = 160,
+      swH = 128,
+      pad = 12,
+      titleH = 48;
 
     const canvas = document.createElement('canvas');
-    canvas.width  = cols * swW + (cols + 1) * pad;
+    canvas.width = cols * swW + (cols + 1) * pad;
     canvas.height = rows * swH + (rows + 1) * pad + titleH;
     const ctx = canvas.getContext('2d')!;
 
@@ -955,8 +982,8 @@ async function showColorPaletteResult(
     colors.forEach(({ hex, r, g, b }, i) => {
       const col = i % cols;
       const row = Math.floor(i / cols);
-      const x   = pad + col * (swW + pad);
-      const y   = titleH + pad + row * (swH + pad);
+      const x = pad + col * (swW + pad);
+      const y = titleH + pad + row * (swH + pad);
 
       // Border
       ctx.fillStyle = '#0a0a0a';
@@ -982,8 +1009,8 @@ async function showColorPaletteResult(
     canvas.toBlob((blob) => {
       if (!blob) return;
       const url = URL.createObjectURL(blob);
-      const a   = document.createElement('a');
-      a.href     = url;
+      const a = document.createElement('a');
+      a.href = url;
       a.download = 'palette.png';
       a.click();
       URL.revokeObjectURL(url);
@@ -1007,5 +1034,10 @@ function isInputFocused(): boolean {
   const el = document.activeElement;
   if (!el) return false;
   const tag = el.tagName.toLowerCase();
-  return tag === 'input' || tag === 'textarea' || tag === 'select' || (el as HTMLElement).isContentEditable;
+  return (
+    tag === 'input' ||
+    tag === 'textarea' ||
+    tag === 'select' ||
+    (el as HTMLElement).isContentEditable
+  );
 }

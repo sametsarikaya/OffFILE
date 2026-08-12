@@ -1,13 +1,13 @@
 /** Maps file extensions to accepted MIME types */
 const EXT_TO_MIME: Record<string, string[]> = {
-  pdf:      ['application/pdf'],
-  png:      ['image/png'],
-  jpg:      ['image/jpeg'],
-  jpeg:     ['image/jpeg'],
-  webp:     ['image/webp'],
-  bmp:      ['image/bmp', 'image/x-bmp'],
-  svg:      ['image/svg+xml'],
-  gif:      ['image/gif'],
+  pdf: ['application/pdf'],
+  png: ['image/png'],
+  jpg: ['image/jpeg'],
+  jpeg: ['image/jpeg'],
+  webp: ['image/webp'],
+  bmp: ['image/bmp', 'image/x-bmp'],
+  svg: ['image/svg+xml'],
+  gif: ['image/gif'],
 };
 
 /**

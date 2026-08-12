@@ -21,15 +21,16 @@ export function createOptionsPanel(
     // Sanitise numeric attributes - these come from the tool registry (static
     // config, not user input), but coerce to Number to prevent accidental
     // injection if the registry ever changes.
-    const min    = Number(opt.min  ?? 0);
-    const max    = Number(opt.max  ?? 100);
-    const step   = Number(opt.step ?? 1);
+    const min = Number(opt.min ?? 0);
+    const max = Number(opt.max ?? 100);
+    const step = Number(opt.step ?? 1);
     const defVal = opt.defaultValue;
 
     if (opt.type === 'select' && opt.options) {
       const optionsHtml = opt.options
-        .map((o) =>
-          `<option value="${escapeHtml(o.value)}" ${o.value === String(defVal) ? 'selected' : ''}>${escapeHtml(o.label)}</option>`
+        .map(
+          (o) =>
+            `<option value="${escapeHtml(o.value)}" ${o.value === String(defVal) ? 'selected' : ''}>${escapeHtml(o.label)}</option>`
         )
         .join('');
 
@@ -40,7 +41,6 @@ export function createOptionsPanel(
       group.querySelector('select')!.addEventListener('change', (e) => {
         currentOptions[opt.id] = (e.target as HTMLSelectElement).value;
       });
-
     } else if (opt.type === 'range') {
       group.innerHTML = `
         <label class="option-group__label" for="opt-${escapeHtml(opt.id)}">${escapeHtml(opt.label)}</label>
@@ -54,7 +54,6 @@ export function createOptionsPanel(
         const valueSpan = group.querySelector(`#opt-${opt.id}-value`) as HTMLElement;
         valueSpan.textContent = `${val}%`;
       });
-
     } else if (opt.type === 'number') {
       group.innerHTML = `
         <label class="option-group__label" for="opt-${escapeHtml(opt.id)}">${escapeHtml(opt.label)}</label>
@@ -64,7 +63,6 @@ export function createOptionsPanel(
       group.querySelector('input')!.addEventListener('input', (e) => {
         currentOptions[opt.id] = Number((e.target as HTMLInputElement).value);
       });
-
     } else if (opt.type === 'text') {
       const inputType = opt.id.toLowerCase().includes('password') ? 'password' : 'text';
       const placeholder = escapeHtml(opt.placeholder ?? '');
@@ -76,7 +74,6 @@ export function createOptionsPanel(
       group.querySelector('input')!.addEventListener('input', (e) => {
         currentOptions[opt.id] = (e.target as HTMLInputElement).value;
       });
-
     } else if (opt.type === 'checkbox') {
       const checked = defVal ? 'checked' : '';
       group.className = 'option-group option-group--checkbox';

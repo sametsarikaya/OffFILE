@@ -27,7 +27,7 @@ const imageMerge: Tool = {
       type: 'select',
       options: [
         { value: 'horizontal', label: 'Side by side' },
-        { value: 'vertical',   label: 'Stack vertically' },
+        { value: 'vertical', label: 'Stack vertically' },
       ],
       defaultValue: 'horizontal',
     },
@@ -36,9 +36,9 @@ const imageMerge: Tool = {
       label: 'Alignment',
       type: 'select',
       options: [
-        { value: 'start',  label: 'Top / Left' },
+        { value: 'start', label: 'Top / Left' },
         { value: 'center', label: 'Center' },
-        { value: 'end',    label: 'Bottom / Right' },
+        { value: 'end', label: 'Bottom / Right' },
       ],
       defaultValue: 'center',
     },
@@ -60,7 +60,7 @@ const imageMerge: Tool = {
     },
   ],
 
-  async renderInteractivePanel(files, options): Promise<HTMLElement> {
+  async renderInteractivePanel(files, _options): Promise<HTMLElement> {
     if (files.length === 0) return document.createElement('div');
 
     const wrap = document.createElement('div');
@@ -79,22 +79,31 @@ const imageMerge: Tool = {
     const originalFiles = [...files];
 
     // Render a thumbnail data URL for each file
-    const thumbUrls: string[] = await Promise.all(files.map((f) => new Promise<string>((res) => {
-      const url = URL.createObjectURL(f);
-      const img = new Image();
-      img.onload = () => {
-        const scale = THUMB_SIZE / Math.max(img.naturalWidth, img.naturalHeight);
-        const c = document.createElement('canvas');
-        c.width  = Math.round(img.naturalWidth  * scale);
-        c.height = Math.round(img.naturalHeight * scale);
-        c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
-        res(c.toDataURL('image/jpeg', 0.75));
-        URL.revokeObjectURL(url);
-        c.width = 0; c.height = 0;
-      };
-      img.onerror = () => { URL.revokeObjectURL(url); res(''); };
-      img.src = url;
-    })));
+    const thumbUrls: string[] = await Promise.all(
+      files.map(
+        (f) =>
+          new Promise<string>((res) => {
+            const url = URL.createObjectURL(f);
+            const img = new Image();
+            img.onload = () => {
+              const scale = THUMB_SIZE / Math.max(img.naturalWidth, img.naturalHeight);
+              const c = document.createElement('canvas');
+              c.width = Math.round(img.naturalWidth * scale);
+              c.height = Math.round(img.naturalHeight * scale);
+              c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+              res(c.toDataURL('image/jpeg', 0.75));
+              URL.revokeObjectURL(url);
+              c.width = 0;
+              c.height = 0;
+            };
+            img.onerror = () => {
+              URL.revokeObjectURL(url);
+              res('');
+            };
+            img.src = url;
+          })
+      )
+    );
 
     const grid = document.createElement('div');
     grid.className = 'reorder-grid';
@@ -139,16 +148,23 @@ const imageMerge: Tool = {
         item.addEventListener('dragstart', (e) => {
           dragSrcIdx = pos;
           item.classList.add('reorder-item--dragging');
-          if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(pos)); }
+          if (e.dataTransfer) {
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', String(pos));
+          }
         });
         item.addEventListener('dragend', () => {
           item.classList.remove('reorder-item--dragging');
-          grid.querySelectorAll('.reorder-item--drag-over').forEach((el) => el.classList.remove('reorder-item--drag-over'));
+          grid
+            .querySelectorAll('.reorder-item--drag-over')
+            .forEach((el) => el.classList.remove('reorder-item--drag-over'));
         });
         item.addEventListener('dragover', (e) => {
           e.preventDefault();
           if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-          grid.querySelectorAll('.reorder-item--drag-over').forEach((el) => el.classList.remove('reorder-item--drag-over'));
+          grid
+            .querySelectorAll('.reorder-item--drag-over')
+            .forEach((el) => el.classList.remove('reorder-item--drag-over'));
           item.classList.add('reorder-item--drag-over');
         });
         item.addEventListener('drop', (e) => {

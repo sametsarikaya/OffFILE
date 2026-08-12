@@ -3,7 +3,8 @@ import type { Tool } from '../../types';
 const faviconGenerator: Tool = {
   id: 'favicon-generator',
   title: 'Favicon Generator',
-  description: 'Generate a complete favicon set (16×16 to 512×512) from any PNG or SVG. Packaged as ZIP, 100% offline.',
+  description:
+    'Generate a complete favicon set (16×16 to 512×512) from any PNG or SVG. Packaged as ZIP, 100% offline.',
   icon: `<svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
     <line x1="8" y1="21" x2="16" y2="21"/>

@@ -16,9 +16,26 @@ const imageWatermark: Tool = {
   acceptedTypes: '.png,.jpg,.jpeg,.webp,.avif,.heic,.heif',
   multiple: false,
   options: [
-    { id: 'text',    label: 'Watermark text', type: 'text',   defaultValue: 'CONFIDENTIAL', placeholder: 'e.g. DRAFT, SAMPLE' },
-    { id: 'opacity', label: 'Opacity (%)',     type: 'range',  min: 5, max: 80, step: 5, defaultValue: 30 },
-    { id: 'color',   label: 'Color',           type: 'select',
+    {
+      id: 'text',
+      label: 'Watermark text',
+      type: 'text',
+      defaultValue: 'CONFIDENTIAL',
+      placeholder: 'e.g. DRAFT, SAMPLE',
+    },
+    {
+      id: 'opacity',
+      label: 'Opacity (%)',
+      type: 'range',
+      min: 5,
+      max: 80,
+      step: 5,
+      defaultValue: 30,
+    },
+    {
+      id: 'color',
+      label: 'Color',
+      type: 'select',
       options: [
         { value: '#888888', label: 'Gray (neutral)' },
         { value: '#ff0000', label: 'Red' },
@@ -94,7 +111,9 @@ const imageWatermark: Tool = {
     opSlider.type = 'range';
     opSlider.id = 'wm-opacity';
     opSlider.className = 'option-group__range';
-    opSlider.min = '5'; opSlider.max = '80'; opSlider.step = '5';
+    opSlider.min = '5';
+    opSlider.max = '80';
+    opSlider.step = '5';
     opSlider.value = String(options.opacity ?? 30);
     opGroup.appendChild(opRow);
     opGroup.appendChild(opSlider);
@@ -111,11 +130,15 @@ const imageWatermark: Tool = {
     colSelect.id = 'wm-color';
     colSelect.className = 'option-group__select';
     [
-      ['#888888', 'Gray (neutral)'], ['#ff0000', 'Red'],
-      ['#0000ff', 'Blue'], ['#000000', 'Black'], ['#ffffff', 'White'],
+      ['#888888', 'Gray (neutral)'],
+      ['#ff0000', 'Red'],
+      ['#0000ff', 'Blue'],
+      ['#000000', 'Black'],
+      ['#ffffff', 'White'],
     ].forEach(([value, label]) => {
       const opt = document.createElement('option');
-      opt.value = value; opt.textContent = label;
+      opt.value = value;
+      opt.textContent = label;
       if (value === String(options.color ?? '#888888')) opt.selected = true;
       colSelect.appendChild(opt);
     });
@@ -129,23 +152,23 @@ const imageWatermark: Tool = {
     const draw = () => {
       const maxW = Math.min(previewWrap.clientWidth || 600, 700);
       const scale = maxW / img.naturalWidth;
-      canvas.width  = Math.round(img.naturalWidth  * scale);
+      canvas.width = Math.round(img.naturalWidth * scale);
       canvas.height = Math.round(img.naturalHeight * scale);
 
       const ctx = canvas.getContext('2d')!;
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      const text    = (String(options.text ?? 'CONFIDENTIAL').trim()) || 'CONFIDENTIAL';
+      const text = String(options.text ?? 'CONFIDENTIAL').trim() || 'CONFIDENTIAL';
       const opacity = Number(options.opacity ?? 30) / 100;
-      const color   = String(options.color ?? '#888888');
+      const color = String(options.color ?? '#888888');
       const fontSize = Math.max(14, Math.min(canvas.width, canvas.height) / 12);
-      const spacing  = fontSize * 5;
+      const spacing = fontSize * 5;
 
       ctx.save();
-      ctx.globalAlpha  = opacity;
-      ctx.fillStyle    = color;
-      ctx.font         = `bold ${fontSize}px sans-serif`;
-      ctx.textAlign    = 'center';
+      ctx.globalAlpha = opacity;
+      ctx.fillStyle = color;
+      ctx.font = `bold ${fontSize}px sans-serif`;
+      ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.translate(canvas.width / 2, canvas.height / 2);
       ctx.rotate(-Math.PI / 4);
@@ -157,9 +180,19 @@ const imageWatermark: Tool = {
       ctx.restore();
     };
 
-    textInput.addEventListener('input',  () => { options.text    = textInput.value;           draw(); });
-    opSlider.addEventListener('input',   () => { options.opacity = Number(opSlider.value); opVal.textContent = `${opSlider.value}%`; draw(); });
-    colSelect.addEventListener('change', () => { options.color   = colSelect.value;             draw(); });
+    textInput.addEventListener('input', () => {
+      options.text = textInput.value;
+      draw();
+    });
+    opSlider.addEventListener('input', () => {
+      options.opacity = Number(opSlider.value);
+      opVal.textContent = `${opSlider.value}%`;
+      draw();
+    });
+    colSelect.addEventListener('change', () => {
+      options.color = colSelect.value;
+      draw();
+    });
 
     requestAnimationFrame(() => draw());
     return wrap;

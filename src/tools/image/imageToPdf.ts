@@ -56,14 +56,7 @@ const imageToPdf: Tool = {
           doc!.addPage([widthMM, heightMM], widthMM > heightMM ? 'landscape' : 'portrait');
         }
 
-        doc!.addImage(
-          img,
-          'JPEG',
-          0,
-          0,
-          widthMM,
-          heightMM
-        );
+        doc!.addImage(img, 'JPEG', 0, 0, widthMM, heightMM);
       } else {
         if (i === 0) {
           doc = new jsPDF({

@@ -32,7 +32,7 @@ const imageCompress: Tool = {
       options: [
         { value: 'image/jpeg', label: 'JPEG (best compression)' },
         { value: 'image/webp', label: 'WebP (modern, smaller)' },
-        { value: 'image/png',  label: 'PNG (lossless)' },
+        { value: 'image/png', label: 'PNG (lossless)' },
       ],
       defaultValue: 'image/jpeg',
     },

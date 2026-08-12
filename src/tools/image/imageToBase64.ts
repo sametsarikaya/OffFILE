@@ -49,14 +49,12 @@ const imageToBase64: Tool = {
     const mimeType = file.type || 'image/png';
     onProgress(75);
 
-    let output = '';
-    if (format === 'dataurl') {
-      output = `data:${mimeType};base64,${b64}`;
-    } else if (format === 'css') {
-      output = `background-image: url("data:${mimeType};base64,${b64}");`;
-    } else {
-      output = b64;
-    }
+    const output =
+      format === 'dataurl'
+        ? `data:${mimeType};base64,${b64}`
+        : format === 'css'
+          ? `background-image: url("data:${mimeType};base64,${b64}");`
+          : b64;
 
     const blob = new Blob([output], { type: 'text/plain;charset=utf-8' });
     onProgress(100);
