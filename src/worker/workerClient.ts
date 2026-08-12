@@ -1,4 +1,6 @@
 import type { WorkerRequest, WorkerResponse } from '../types';
+import { getToolById } from '../tools/registry';
+import { validateToolOptions } from '../tools/optionsSchema';
 
 type ProgressCallback = (percent: number) => void;
 
@@ -72,6 +74,19 @@ function dispatchToWorker(
   });
 }
 
+/**
+ * Validates options against the schema derived from the tool's own declaration,
+ * so what the UI offers and what the worker receives can never disagree.
+ */
+function checkedOptions(toolId: string, options: Record<string, unknown>): Record<string, unknown> {
+  const tool = getToolById(toolId);
+  if (!tool) return options;
+
+  const result = validateToolOptions(tool, options);
+  if (!result.ok) throw new Error(result.error);
+  return result.options;
+}
+
 export async function runTool(
   toolId: string,
   files: File[],
@@ -79,6 +94,7 @@ export async function runTool(
   onProgress: ProgressCallback
 ): Promise<{ blob: Blob; filename: string }> {
   const id = String(++idCounter);
+  const validated = checkedOptions(toolId, options);
   const buffers = await Promise.all(files.map((f) => f.arrayBuffer()));
   const request: WorkerRequest = {
     id,
@@ -86,7 +102,7 @@ export async function runTool(
     buffers,
     fileNames: files.map((f) => f.name),
     fileMimes: files.map((f) => f.type),
-    options,
+    options: validated,
   };
   const result = await dispatchToWorker(getWorker(0), request, onProgress);
   return { blob: new Blob([result.buffer], { type: result.mime }), filename: result.filename };
@@ -101,6 +117,8 @@ export async function runToolBatch(
 ): Promise<{ blob: Blob; filename: string }[]> {
   const total = files.length;
   if (total === 0) return [];
+
+  const validated = checkedOptions(toolId, options);
 
   // Distribute files round-robin across pool workers
   const workerCount = Math.min(POOL_SIZE, total);
@@ -131,7 +149,7 @@ export async function runToolBatch(
           buffers: [buf],
           fileNames: [file.name],
           fileMimes: [file.type],
-          options,
+          options: validated,
         };
         const result = await dispatchToWorker(getWorker(wi), req, (pct) => {
           wp[wi].current = pct;
