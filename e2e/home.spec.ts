@@ -49,10 +49,21 @@ test.describe('home page', () => {
 
   test('opens a tool from a search result', async ({ page }) => {
     await page.locator('#nav-search-input').fill('grayscale');
-    // NOTE: the hidden category card keeps its id, so the search copy is a
-    // duplicate id in the DOM. Scope to the visible one until that is fixed.
-    await page.locator('#tool-card-image-grayscale:visible').click();
+    await page.locator('#tool-card-image-grayscale').click();
     await expect(page.locator('.tool-header__title')).toHaveText('Image to Grayscale');
+  });
+
+  test('never puts the same tool-card id in the DOM twice', async ({ page }) => {
+    // Search renders the matching cards again; the category sections they came
+    // from are detached rather than hidden so their ids do not collide.
+    await page.locator('#nav-search-input').fill('image');
+
+    const duplicates = await page.evaluate(() => {
+      const ids = [...document.querySelectorAll('[id]')].map((el) => el.id);
+      return ids.filter((id, i) => ids.indexOf(id) !== i);
+    });
+
+    expect(duplicates).toEqual([]);
   });
 
   test('navigates into a tool and back', async ({ page }) => {

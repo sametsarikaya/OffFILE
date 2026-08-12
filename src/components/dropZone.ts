@@ -92,7 +92,9 @@ export function createDropZone(config: DropZoneConfig): HTMLElement {
     if (!allowed.length) return;
 
     if (maxWarnBytes) {
-      checkSizeWarning(allowed, maxWarnBytes, zone.closest('.work-area-wrapper') ?? document.body);
+      // The warning belongs above the work area. `.work-area-wrapper` never
+      // existed, so it used to land at the end of <body>, off screen.
+      checkSizeWarning(allowed, maxWarnBytes, zone.closest('#work-area') ?? document.body);
     }
 
     onFiles(allowed);
