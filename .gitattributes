@@ -1,0 +1,11 @@
+# Prettier is configured with endOfLine: lf; keep the working tree matching so
+# `prettier --check` behaves the same on Windows and CI.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.pdf binary
