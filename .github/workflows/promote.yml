@@ -1,0 +1,28 @@
+name: Promote
+
+# A merge to main puts the build that was tested on wings live. Nothing is built here.
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: promote
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  promote:
+    permissions:
+      contents: write
+      actions: read
+      pull-requests: read
+    uses: sametsarikaya/workflows/.github/workflows/web-promote.yml@v1
+    with:
+      site: offfile
+      prod-url: https://offfile.sametsarikaya.com
+      prod-dir: ${{ vars.FTP_DIR }}
+      pages: |
+        /
+    secrets: inherit

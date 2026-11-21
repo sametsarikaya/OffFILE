@@ -1,0 +1,26 @@
+name: Rollback
+
+# Points offfile.sametsarikaya.com back at an earlier release folder. Takes seconds; nothing is uploaded.
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: Release to go back to, e.g. offfile-v1.2.0 (empty = the one before the live one)
+        required: false
+        type: string
+
+concurrency:
+  group: promote
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  rollback:
+    uses: sametsarikaya/workflows/.github/workflows/web-rollback.yml@v1
+    with:
+      site: offfile
+      prod-dir: ${{ vars.FTP_DIR }}
+      release: ${{ inputs.release }}
+    secrets: inherit

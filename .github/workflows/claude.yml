@@ -1,0 +1,29 @@
+name: Claude
+
+# Copy to .github/workflows/claude.yml. Write @claude in an issue or a PR comment and Claude works on it.
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  claude:
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    uses: sametsarikaya/workflows/.github/workflows/common-claude.yml@v1
+    with:
+      rules: common web
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}

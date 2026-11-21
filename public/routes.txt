@@ -1,0 +1,2 @@
+# One path per line. The app routes by #hash, so the only server path is the home page.
+/

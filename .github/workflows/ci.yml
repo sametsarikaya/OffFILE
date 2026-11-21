@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: ['**']
+    tags-ignore: ['**']
+  pull_request:
+    types: [opened, edited, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ci-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    uses: sametsarikaya/workflows/.github/workflows/common-ci.yml@v1
+    with:
+      # No lint or tests yet; the build runs tsc first, so it is the typecheck too.
+      run: |
+        npm run build
+
+  pr-gate:
+    if: github.event_name == 'pull_request'
+    uses: sametsarikaya/workflows/.github/workflows/common-pr-gate.yml@v1

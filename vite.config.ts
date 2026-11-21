@@ -3,6 +3,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
   root: '.',
+  // Wings serves the build from /offfile/, live from /.
+  base: process.env.BASE_PATH ?? '/',
   publicDir: 'public',
   build: {
     outDir: 'dist',
@@ -46,7 +48,6 @@ export default defineConfig({
         theme_color: '#ffe600',
         background_color: '#f5f0de',
         display: 'standalone',
-        start_url: '/',
         icons: [
           { src: 'icons/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' },
         ],

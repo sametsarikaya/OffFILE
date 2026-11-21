@@ -1,0 +1,42 @@
+name: Wings
+
+# Every pull request goes to wings.sametsarikaya.com/offfile/ first, checked against the live site.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: wings-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  wings:
+    permissions:
+      contents: read
+      pull-requests: write
+    uses: sametsarikaya/workflows/.github/workflows/web-wings.yml@v1
+    with:
+      site: offfile
+      build: npm run build
+      dist: dist
+      prod-url: https://offfile.sametsarikaya.com
+      pages: |
+        /
+    secrets: inherit
+
+  # The one required check: it always runs, and any failed site blocks the merge.
+  result:
+    name: Wings result
+    if: always()
+    needs: [wings]
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "$RESULTS"
+          [[ "$RESULTS" != *failure* && "$RESULTS" != *cancelled* ]]
